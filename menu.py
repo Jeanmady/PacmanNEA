@@ -20,6 +20,69 @@ class Menu():
         pygame.display.update()
         self.game.reset_keys()
 
+
+class LoginMenu(Menu):
+    def __init__(self, game):
+        Menu.__init__(self, game)  # gets all variables from menu class
+        self.state = "Login"  # sets initial position of cursour to be login as its thew fisrt item
+        self.loginx, self.loginy = self.mid_w, self.mid_h + 10
+        self.registerx, self.registery = self.mid_w, self.mid_h + 30
+        self.exitx, self.exity = self.mid_w, self.mid_h + 50
+        self.cursor_rect_left.midtop = (self.loginx + self.offset_left, self.loginy)
+        self.cursor_rect_right.midtop = (self.loginx + self.offset_right, self.loginy)
+
+    def display_menu(self):
+        self.run_display = True
+        while self.run_display:
+            self.game.check_events()
+            self.check_input()
+            self.game.display.fill(self.game.BLACK)
+            self.game.draw_text('Login', 20, self.loginx, self.loginy)
+            self.game.draw_text("Register", 20, self.registerx, self.registery)
+            self.game.draw_text("Exit", 20, self.exitx, self.exity)
+            self.draw_cursors()
+            self.blit_screen()
+
+    def move_cursors(self):
+        """Method moves cursor by:
+            Checking state, 
+            adjusting cursors, 
+            then readjust state"""
+        if self.game.DOWN_KEY:
+            if self.state == 'Login':
+                self.cursor_rect_left.midtop = (self.registerx + self.offset_left, self.registery)
+                self.cursor_rect_right.midtop = (self.registerx + self.offset_right, self.registery)
+                self.state = 'Register'
+            elif self.state == 'Register':
+                self.cursor_rect_left.midtop = (self.exitx + self.offset_left, self.exity)
+                self.cursor_rect_right.midtop = (self.exitx + self.offset_right, self.exity)
+                self.state = 'Exit'
+
+        elif self.game.UP_KEY:
+            if self.state == 'Exit':
+                self.cursor_rect_left.midtop = (self.registerx + self.offset_left, self.registery)
+                self.cursor_rect_right.midtop = (self.registerx + self.offset_right, self.registery)
+                self.state = 'Register'
+            elif self.state == 'Register':
+                self.cursor_rect_left.midtop = (self.loginx + self.offset_left, self.loginy)
+                self.cursor_rect_right.midtop = (self.loginx + self.offset_right, self.loginy)
+                self.state = 'Login'
+
+    def check_input(self):
+        self.move_cursors()
+        if self.game.START_KEY:
+            if self.state == 'Login':
+                self.game.running = True    #here shoud add functions to do with the login proccesss
+            elif self.state == 'Register':
+                pass
+            elif self.state == 'Exit':
+                self.game.intro, self.game.running, self.game.playing = False, False, False
+            self.run_display = False
+
+
+
+
+
 class MainMenu(Menu):
     def __init__(self, game):
         Menu.__init__(self, game) #gets all variables form menu class
@@ -38,6 +101,8 @@ class MainMenu(Menu):
             self.game.check_events()
             self.check_input()
             self.game.display.fill(self.game.BLACK)
+            self.game.draw_text('Highscore', 15, 75,10)
+            #highscore acc score here
             self.game.draw_text('Main Menu', 20, self.mid_w, self.mid_h - 20)
             self.game.draw_text("Begin Game", 20, self.startx, self.starty)
             self.game.draw_text("Game Controls", 20, self.controlsx, self.controlsy)
@@ -100,7 +165,10 @@ class MainMenu(Menu):
             elif self.state == 'Boards':
                 pass
             elif self.state == 'Exit':
-                self.game.running, self.game.playing = False, False
+                self.game.intro, self.game.running, self.game.playing = False, False, False
             self.run_display = False
 
+class GameControls(Menu):
+    def __init__(self, game):
+        Menu.__init__(self, game)
     

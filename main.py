@@ -1,6 +1,7 @@
 from game import Game
 
 g = Game()
+g.curr_menu.display_menu()
 while g.running:
-    g.curr_menu.display_menu()
+    g.main_menu.display_menu()
     g.game_loop()
