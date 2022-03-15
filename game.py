@@ -1,7 +1,7 @@
 import pygame
 from menu import MainMenu
 from menu import LoginMenu
-
+from menu import RegisterMenu
 
 class Game():
     def __init__(self):
@@ -10,6 +10,7 @@ class Game():
         self.intro = True
         self.running = False
         self.playing = False
+        self.register = False
         self.UP_KEY = False
         self.DOWN_KEY = False
         self.START_KEY = False
@@ -20,11 +21,12 @@ class Game():
         self.DISPLAY_H = 270*2
         self.display = pygame.display.set_mode((self.DISPLAY_H, self.DISPLAY_W))
         self.window = pygame.display.set_mode(((self.DISPLAY_W,self.DISPLAY_H)))
-        #self.font_name = pygame.font.get_default_font()    #vhange later
-        self.font_name = '8-BIT WONDER.TTF'
+        self.font_name_defult = pygame.font.Font(None, 20)   #vhange later
+        self.font_name_8bit = '8-BIT WONDER.TTF'
         self.BLACK = (0,0,0)
         self.WHITE = (255,255,255)
         self.main_menu = MainMenu(self)  #refrence main menu object
+        self.register_menu = RegisterMenu(self)
         self.curr_menu = LoginMenu(self)   #enables current menu to be chanegd depenfin gon whats selected
         
     def game_loop(self):
@@ -56,6 +58,8 @@ class Game():
                     self.LEFT_KEY = True
                 if event.key == pygame.K_RIGHT:
                     self.RIGHT_KEY = True
+
+    
                     
     def reset_keys(self):  #function to reset keys
         self.UP_KEY = False
@@ -65,10 +69,18 @@ class Game():
         self.LEFT_KEY = False
         self.RIGHT_KEY = False
 
-    def draw_text(self, text, size, x,y):
-        font = pygame.font.Font(self.font_name,size)
+    def draw_text_8bit(self, text, size, x,y):
+        font = pygame.font.Font(self.font_name_8bit,size)
         text_surface = font.render(text, True, self.WHITE) #creates a rectangular image of text
         text_rect = text_surface.get_rect()
         text_rect.center = (x,y)
         self.display.blit(text_surface, text_rect)
+
+    def draw_text(self, text, size, x,y):
+        font =  self.font_name_defult
+        text_surface = font.render(text, True, self.WHITE) #creates a rectangular image of text
+        text_rect = text_surface.get_rect()
+        text_rect.center = (x,y)
+        self.display.blit(text_surface, text_rect)
+
         
