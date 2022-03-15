@@ -17,8 +17,10 @@ class Game():
         self.BACK_KEY = False
         self.RIGHT_KEY = False
         self.LEFT_KEY = False
+        self.UNICODE_KEY = False
         self.DISPLAY_W = 480*2
         self.DISPLAY_H = 270*2
+        self.unicode_text = ''
         self.display = pygame.display.set_mode((self.DISPLAY_H, self.DISPLAY_W))
         self.window = pygame.display.set_mode(((self.DISPLAY_W,self.DISPLAY_H)))
         self.font_name_defult = pygame.font.Font(None, 20)   #vhange later
@@ -58,8 +60,9 @@ class Game():
                     self.LEFT_KEY = True
                 if event.key == pygame.K_RIGHT:
                     self.RIGHT_KEY = True
-
-    
+                else:
+                    self.UNICODE_KEY = True
+                    self.unicode_text = event.unicode          
                     
     def reset_keys(self):  #function to reset keys
         self.UP_KEY = False
@@ -68,8 +71,9 @@ class Game():
         self.BACK_KEY = False
         self.LEFT_KEY = False
         self.RIGHT_KEY = False
+        self.UNICODE_KEY = False
 
-    def draw_text_8bit(self, text, size, x,y):
+    def draw_text_8bit(self, text, size, x,y):   #try add left organisatoion in order to block fonts later down the line
         font = pygame.font.Font(self.font_name_8bit,size)
         text_surface = font.render(text, True, self.WHITE) #creates a rectangular image of text
         text_rect = text_surface.get_rect()

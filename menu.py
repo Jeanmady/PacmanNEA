@@ -20,15 +20,7 @@ class Menu():
         pygame.display.update()
         self.game.reset_keys()
 
-    def check_typing(self, text): #checks whethruser is entring text --use for login and adding friend
-        
-        for event in pygame.event.get():   
-            if event.type == pygame.KEYDOWN:
-                print("hello")
-                if event.key == pygame.K_BACKSPACE:
-                    text = text [:-1]
-                else:
-                    text += event.unicode
+    
 
 
 class LoginMenu(Menu):
@@ -98,7 +90,7 @@ class RegisterMenu(Menu):
         self.renterx, self.rentery = self.mid_w, self.mid_h + 40
         self.registerx, self.registery = self.mid_w, self.mid_h + 90
         self.exitx, self.exity = self.mid_w, self.mid_h + 110
-        self.inp_username, self.inp_pass, self.inp_repass = ': ', ': ', ': '
+        self.inp_username, self.inp_pass, self.inp_repass = '', '', ''
         self.cursor_rect_left.midtop = (self.usernamex - 100 + self.offset_left, self.usernamey)
         self.cursor_rect_right.midtop = (self.usernamex + 40 + self.offset_right, self.usernamey)
 
@@ -107,7 +99,6 @@ class RegisterMenu(Menu):
         while self.run_display:
             self.game.check_events()
             self.check_input()
-            
             self.game.display.fill(self.game.BLACK)
             self.game.draw_text_8bit('Enter Username', 15, self.usernamex - 100, self.usernamey)
             self.game.draw_text_8bit("Enter Password", 15, self.passwordx - 100, self.passwordy)
@@ -118,13 +109,8 @@ class RegisterMenu(Menu):
             self.game.draw_text(self.inp_pass, 10, self.passwordx + 40, self.passwordy)
             self.game.draw_text(self.inp_repass, 10, self.renterx + 40, self.rentery)
             self.draw_cursors()
-            if self.state == 'Enter Username':    #text = ''
-                self.check_typing(self.inp_username)
-            elif self.state == 'Enter Password':
-                self.check_typing(self.inp_pass)
-            elif self.state == 'ReEnter Password':
-                self.check_typing(self.inp_repass)
             self.blit_screen()
+
 
     def move_cursors(self):
         """Method moves cursor by:
@@ -166,6 +152,16 @@ class RegisterMenu(Menu):
                 self.cursor_rect_left.midtop = (self.usernamex - 100 + self.offset_left, self.usernamey)
                 self.cursor_rect_right.midtop = (self.usernamex + 40 + self.offset_right, self.usernamey)
                 self.state = 'Enter Username'
+
+        elif self.game.BACK_KEY:
+                    if self.state == 'Enter Username':
+                        self.inp_username = self.inp_username[:-1]
+
+        elif self.game.UNICODE_KEY:
+            if self.state == 'Enter Username':
+                self.inp_username += self.game.unicode_text
+
+        
 
     def check_input(self):
         self.move_cursors()
