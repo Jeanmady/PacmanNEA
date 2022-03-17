@@ -82,11 +82,30 @@ class LoginMenu(Menu):
         self.move_cursors()
         if self.game.START_KEY:
             if self.state == 'Login':
-                self.game.running = True    #here shoud add functions to do with the login proccesss
+                self.game.signin = True
+                self.game.intro = False
+                self.game.running = False
+                self.game.playing = False
+                self.game.register = False
+                self.game.login = False
+               #add: to after signin self.game.running = True    #here shoud add functions to do with the login proccesss
             elif self.state == 'Register':
-                self.game.register = True    # should everything else be made false?
+                self.game.signin = False
+                self.game.intro = False
+                self.game.running = False
+                self.game.playing = False
+                self.game.register = True
+                self.game.login = False
             elif self.state == 'Exit':
-                self.game.intro, self.game.running, self.game.playing, self.game.register, self.game.login = False, False, False, False, False
+                self.game.login = False
+                self.game.intro = False
+                self.game.running = False
+                self.game.playing = False
+                self.game.register = False
+                self.game.signin = False
+                self.game.login_menu.run_display = False
+                self.game.register_menu.run_display = False
+                self.game.main_menu.run_display = False
             self.run_display = False
 
 class SignInMenu(Menu):
@@ -112,12 +131,77 @@ class SignInMenu(Menu):
             self.game.display.fill(self.game.BLACK)
             self.game.draw_text_8bit('Enter Username', 15, self.usernamex - 100, self.usernamey)
             self.game.draw_text_8bit("Enter Password", 15, self.passwordx - 100, self.passwordy)
-            self.game.draw_text_8bit("Login", 20, self.signinx, self.signiny)
+            self.game.draw_text_8bit("Login", 20, self.loginx, self.loginy)
             self.game.draw_text_8bit("Exit", 20, self.exitx, self.exity)
-            self.game.draw_text(self.inp_username, 10, self.usernamex + 40, self.usernamey )
-            self.game.draw_text(self.inp_pass, 10, self.passwordx + 40, self.passwordy)
+            self.game.draw_text_bottom_left(self.inp_username, 10, self.usernamex + 10, self.usernamey )
+            self.game.draw_text_bottom_left(self.inp_pass, 10, self.passwordx + 10, self.passwordy)
             self.draw_cursors()
             self.blit_screen()
+
+    def move_cursors(self):
+        """Method moves cursor by:
+            Checking state, 
+            adjusting cursors, 
+            then readjust state"""
+        if self.game.DOWN_KEY:
+            if self.state == 'Enter Username':
+                self.cursor_rect_left.midtop = (self.passwordx - 100 + self.offset_left, self.passwordy)
+                self.cursor_rect_right.midtop = (self.passwordx + 40 + self.offset_right, self.passwordy)
+                self.state = 'Enter Password'
+            elif self.state == 'Enter Password':
+                self.cursor_rect_left.midtop = (self.loginx - 100 + self.offset_left, self.loginy)
+                self.cursor_rect_right.midtop = (self.loginx + 40 + self.offset_right, self.loginy)
+                self.state = 'Login'
+            elif self.state == 'Login':
+                self.cursor_rect_left.midtop = (self.exitx + self.offset_left, self.exity)
+                self.cursor_rect_right.midtop = (self.exitx + self.offset_right, self.exity)
+                self.state = 'Exit'
+
+        elif self.game.UP_KEY:
+            if self.state == 'Exit':
+                self.cursor_rect_left.midtop = (self.loginx + self.offset_left, self.loginy)
+                self.cursor_rect_right.midtop = (self.loginx + self.offset_right, self.loginy)
+                self.state = 'Login'
+            elif self.state == 'Login':
+                self.cursor_rect_left.midtop = (self.passwordx - 100 + self.offset_left, self.passwordy)
+                self.cursor_rect_right.midtop = (self.passwordx + 40 + self.offset_right, self.passwordy)
+                self.state = 'Enter Password'
+            elif self.state == 'Enter Password':
+                self.cursor_rect_left.midtop = (self.usernamex - 100 + self.offset_left, self.usernamey)
+                self.cursor_rect_right.midtop = (self.usernamex + 40 + self.offset_right, self.usernamey)
+                self.state = 'Enter Username'
+
+        elif self.game.BACK_KEY:
+                    if self.state == 'Enter Username':
+                        self.inp_username = self.inp_username[:-1]
+                    elif self.state == 'Enter Password':
+                        self.inp_pass = self.inp_pass[:-1]
+
+        elif self.game.UNICODE_KEY:
+            if self.state == 'Enter Username':
+                self.inp_username += self.game.unicode_text
+            elif self.state == 'Enter Password':
+                self.inp_pass += self.game.unicode_text
+
+    def check_input(self):
+        """ Checks for user input on keyboard """
+        self.move_cursors()
+        if self.game.START_KEY:
+            if self.state == 'Register':
+                self.game.login = False
+                self.game.intro = False
+                self.game.running = True
+                self.game.playing = False
+                self.game.register = False
+                self.game.signin = False
+            elif self.state == 'Exit':
+                self.game.login = True
+                self.game.intro = True
+                self.game.running = False
+                self.game.playing = False
+                self.game.register = False
+                self.game.signin = False
+            self.run_display = False
 
 class RegisterMenu(Menu):
     """ Class to create Register Sub Menu for Login Menu Class """
@@ -217,7 +301,11 @@ class RegisterMenu(Menu):
             if self.state == 'Register':
                 pass
             elif self.state == 'Exit':
-                self.game.intro, self.game.running, self.game.playing, self.game.register, self.game.login = False, False, False, False, False
+                self.game.intro = False
+                self.game.running = False
+                self.game.playing = False
+                self.game.register = False
+                self.game.login = True
             self.run_display = False
 
 class MainMenu(Menu):

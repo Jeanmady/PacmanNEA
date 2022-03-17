@@ -2,16 +2,18 @@ import pygame
 from menu import MainMenu
 from menu import LoginMenu
 from menu import RegisterMenu
+from menu import SignInMenu
 
 class Game():
     """ Attributes """
     def __init__(self):
         pygame.init()
-        self.login = False
+        self.login = True
         self.intro = True
         self.running = False
         self.playing = False
         self.register = False
+        self.signin = False
         self.UP_KEY = False
         self.DOWN_KEY = False
         self.START_KEY = False
@@ -19,8 +21,8 @@ class Game():
         self.RIGHT_KEY = False
         self.LEFT_KEY = False
         self.UNICODE_KEY = False
-        self.DISPLAY_W = 480*2
-        self.DISPLAY_H = 270*2
+        self.DISPLAY_W = 480*1.5
+        self.DISPLAY_H = 270*1.5 #remoed times 2
         self.unicode_text = ''
         self.display = pygame.display.set_mode((self.DISPLAY_H, self.DISPLAY_W))
         self.window = pygame.display.set_mode(((self.DISPLAY_W,self.DISPLAY_H)))
@@ -30,7 +32,8 @@ class Game():
         self.WHITE = (255,255,255)
         self.main_menu = MainMenu(self)                                                                         #refrence main menu object
         self.register_menu = RegisterMenu(self)
-        self.curr_menu = LoginMenu(self)                                                                        #enables current menu to be chanegd depenfin gon whats selected
+        self.login_menu = LoginMenu(self)                                                                        #enables current menu to be chanegd depenfin gon whats selected
+        self.signin_menu = SignInMenu(self)
 
     """ Methods """
     def game_loop(self):
@@ -48,8 +51,15 @@ class Game():
         """ Method to check whenever user enters a key """
         for event in pygame.event.get():                                                                        #goes through a list of everything player can do on computer
             if event.type == pygame.QUIT:                                                                       #checks if user closes window
-                 self.intro, self.running, self.playing = False, False, False
-                 self.curr_menu.run_display, self.main_menu.run_display = False, False
+                self.login = False
+                self.intro = False
+                self.running = False
+                self.playing = False
+                self.register = False
+                self.signin = False
+                self.login_menu.run_display = False
+                self.register_menu.run_display = False
+                self.main_menu.run_display = False
             if event.type == pygame.KEYDOWN:                                                                    #checks if user presses something on keyboard
                 if event.key == pygame.K_RETURN:
                     self.START_KEY = True
