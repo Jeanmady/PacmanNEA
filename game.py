@@ -93,4 +93,12 @@ class Game():
         text_rect.center = (x,y)
         self.display.blit(text_surface, text_rect)
 
+    def draw_text_bottom_left(self, text, size, x,y):
+        """ Method to create text using bottom left as organiser """
+        font = self.font_name_defult
+        text_surface = font.render(text, True, self.WHITE)
+        text_rect = text_surface.get_rect()
+        text_rect.midleft = (x,y)
+        self.display.blit(text_surface, text_rect)
+
         

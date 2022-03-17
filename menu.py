@@ -86,7 +86,7 @@ class LoginMenu(Menu):
             elif self.state == 'Register':
                 self.game.register = True    # should everything else be made false?
             elif self.state == 'Exit':
-                self.game.intro, self.game.running, self.game.playing = False, False, False
+                self.game.intro, self.game.running, self.game.playing, self.game.register, self.game.login = False, False, False, False, False
             self.run_display = False
 
 class SignInMenu(Menu):
@@ -146,9 +146,9 @@ class RegisterMenu(Menu):
             self.game.draw_text_8bit("ReEnter Password", 15, self.renterx - 100, self.rentery)
             self.game.draw_text_8bit("Register", 20, self.registerx, self.registery)
             self.game.draw_text_8bit("Exit", 20, self.exitx, self.exity)
-            self.game.draw_text(self.inp_username, 10, self.usernamex + 40, self.usernamey )
-            self.game.draw_text(self.inp_pass, 10, self.passwordx + 40, self.passwordy)
-            self.game.draw_text(self.inp_repass, 10, self.renterx + 40, self.rentery)
+            self.game.draw_text_bottom_left(self.inp_username, 10, self.usernamex + 10, self.usernamey )
+            self.game.draw_text_bottom_left(self.inp_pass, 10, self.passwordx + 10, self.passwordy)
+            self.game.draw_text_bottom_left(self.inp_repass, 10, self.renterx + 25, self.rentery)
             self.draw_cursors()
             self.blit_screen()
 
@@ -197,12 +197,18 @@ class RegisterMenu(Menu):
         elif self.game.BACK_KEY:
                     if self.state == 'Enter Username':
                         self.inp_username = self.inp_username[:-1]
+                    elif self.state == 'Enter Password':
+                        self.inp_pass = self.inp_pass[:-1]
+                    elif self.state == 'ReEnter Password':
+                        self.inp_repass = self.inp_repass[:-1]
 
         elif self.game.UNICODE_KEY:
             if self.state == 'Enter Username':
                 self.inp_username += self.game.unicode_text
-
-        
+            elif self.state == 'Enter Password':
+                self.inp_pass += self.game.unicode_text
+            elif self.state == 'ReEnter Password':
+                self.inp_repass += self.game.unicode_text 
 
     def check_input(self):
         """ Checks for user input on keyboard """
@@ -211,11 +217,8 @@ class RegisterMenu(Menu):
             if self.state == 'Register':
                 pass
             elif self.state == 'Exit':
-                self.game.intro, self.game.running, self.game.playing, self.game.register= False, False, False, False
+                self.game.intro, self.game.running, self.game.playing, self.game.register, self.game.login = False, False, False, False, False
             self.run_display = False
-
-
-        
 
 class MainMenu(Menu):
     """ Attributes """
@@ -304,7 +307,7 @@ class MainMenu(Menu):
             elif self.state == 'Boards':
                 pass
             elif self.state == 'Exit':
-                self.game.intro, self.game.running, self.game.playing = False, False, False
+                self.game.intro, self.game.running, self.game.playing, self.game.register, self.game.login = False, False, False, False, False
             self.run_display = False
 
 class GameControls(Menu):
