@@ -187,7 +187,7 @@ class SignInMenu(Menu):
         """ Checks for user input on keyboard """
         self.move_cursors()
         if self.game.START_KEY:
-            if self.state == 'Register':
+            if self.state == 'Login':       # not exiting back rto login menu and not going to game once login is pressed
                 self.game.login = False
                 self.game.intro = False
                 self.game.running = True
