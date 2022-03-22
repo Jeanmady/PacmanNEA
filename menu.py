@@ -12,6 +12,11 @@ class Menu():
         self.offset_left = -150                                                                            # moves cursor to the left
         self.cursor_rect_right = pygame.Rect(0,0,20,20)                                                    # 20 by 20 square as a cursor for right hand side
         self.offset_right = 150                                                                            # moves cursor to the right
+        self.inp_username = ''
+        self.inp_pass = ''
+        self.inp_repass = ''
+        self.hidden_pass = ''
+        self.hidden_repass = ''
 
     """ Methods """
     def draw_cursors(self):
@@ -24,9 +29,6 @@ class Menu():
         self.game.window.blit(self.game.display, (0,0)) 
         pygame.display.update()
         self.game.reset_keys()
-
-    
-
 
 class LoginMenu(Menu):
     """ Attributes """
@@ -118,7 +120,6 @@ class SignInMenu(Menu):
         self.passwordx, self.passwordy = self.mid_w, self.mid_h + 20
         self.loginx, self.loginy = self.mid_w, self.mid_h + 70
         self.exitx, self.exity = self.mid_w, self.mid_h + 90
-        self.inp_username, self.inp_pass = '', ''
         self.cursor_rect_left.midtop = (self.usernamex - 100 + self.offset_left, self.usernamey)
         self.cursor_rect_right.midtop = (self.usernamex + 40 + self.offset_right, self.usernamey)
 
@@ -134,7 +135,7 @@ class SignInMenu(Menu):
             self.game.draw_text_8bit("Login", 20, self.loginx, self.loginy)
             self.game.draw_text_8bit("Exit", 20, self.exitx, self.exity)
             self.game.draw_text_bottom_left(self.inp_username, 10, self.usernamex + 10, self.usernamey )
-            self.game.draw_text_bottom_left(self.inp_pass, 10, self.passwordx + 10, self.passwordy)
+            self.game.draw_text_bottom_left(self.hidden_pass, 10, self.passwordx + 10, self.passwordy)
             self.draw_cursors()
             self.blit_screen()
 
@@ -176,18 +177,23 @@ class SignInMenu(Menu):
                         self.inp_username = self.inp_username[:-1]
                     elif self.state == 'Enter Password':
                         self.inp_pass = self.inp_pass[:-1]
+                        self.hidden_pass = self.hidden_pass[:-1]
 
         elif self.game.UNICODE_KEY:
             if self.state == 'Enter Username':
                 self.inp_username += self.game.unicode_text
             elif self.state == 'Enter Password':
                 self.inp_pass += self.game.unicode_text
+                self.hidden_pass += '*'
 
     def check_input(self):
         """ Checks for user input on keyboard """
         self.move_cursors()
         if self.game.START_KEY:
-            if self.state == 'Login':       # not exiting back rto login menu and not going to game once login is pressed
+            if self.state == 'Login':      # not exiting back rto login menu and not going to game once login is pressed
+                self.inp_pass = ''
+                self.inp_username = ''
+                self.inp_repass = ''
                 self.game.login = False
                 self.game.intro = False
                 self.game.running = True
@@ -195,6 +201,9 @@ class SignInMenu(Menu):
                 self.game.register = False
                 self.game.signin = False
             elif self.state == 'Exit':
+                self.inp_pass = ''
+                self.inp_username = ''
+                self.inp_repass = ''
                 self.game.login = True
                 self.game.intro = True
                 self.game.running = False
@@ -214,7 +223,6 @@ class RegisterMenu(Menu):
         self.renterx, self.rentery = self.mid_w, self.mid_h + 40
         self.registerx, self.registery = self.mid_w, self.mid_h + 90
         self.exitx, self.exity = self.mid_w, self.mid_h + 110
-        self.inp_username, self.inp_pass, self.inp_repass = '', '', ''
         self.cursor_rect_left.midtop = (self.usernamex - 100 + self.offset_left, self.usernamey)
         self.cursor_rect_right.midtop = (self.usernamex + 40 + self.offset_right, self.usernamey)
 
@@ -231,8 +239,8 @@ class RegisterMenu(Menu):
             self.game.draw_text_8bit("Register", 20, self.registerx, self.registery)
             self.game.draw_text_8bit("Exit", 20, self.exitx, self.exity)
             self.game.draw_text_bottom_left(self.inp_username, 10, self.usernamex + 10, self.usernamey )
-            self.game.draw_text_bottom_left(self.inp_pass, 10, self.passwordx + 10, self.passwordy)
-            self.game.draw_text_bottom_left(self.inp_repass, 10, self.renterx + 25, self.rentery)
+            self.game.draw_text_bottom_left(self.hidden_pass, 10, self.passwordx + 10, self.passwordy)
+            self.game.draw_text_bottom_left(self.hidden_repass, 10, self.renterx + 25, self.rentery)
             self.draw_cursors()
             self.blit_screen()
 
@@ -283,22 +291,29 @@ class RegisterMenu(Menu):
                         self.inp_username = self.inp_username[:-1]
                     elif self.state == 'Enter Password':
                         self.inp_pass = self.inp_pass[:-1]
+                        self.hidden_pass = self.hidden_pass[:-1]
                     elif self.state == 'ReEnter Password':
                         self.inp_repass = self.inp_repass[:-1]
+                        self.hidden_repass = self.hidden_repass[:-1]
 
         elif self.game.UNICODE_KEY:
             if self.state == 'Enter Username':
                 self.inp_username += self.game.unicode_text
             elif self.state == 'Enter Password':
                 self.inp_pass += self.game.unicode_text
+                self.hidden_pass += '*'
             elif self.state == 'ReEnter Password':
-                self.inp_repass += self.game.unicode_text 
+                self.inp_repass += self.game.unicode_text
+                self.hidden_repass += '*'
 
     def check_input(self):
         """ Checks for user input on keyboard """
         self.move_cursors()
         if self.game.START_KEY:
             if self.state == 'Register':
+                self.inp_pass = ''
+                self.inp_username = ''
+                self.inp_repass = ''
                 pass
             elif self.state == 'Exit':
                 self.game.intro = False
@@ -306,6 +321,9 @@ class RegisterMenu(Menu):
                 self.game.playing = False
                 self.game.register = False
                 self.game.login = True
+                self.inp_pass = ''
+                self.inp_username = ''
+                self.inp_repass = ''
             self.run_display = False
 
 class MainMenu(Menu):
@@ -387,6 +405,7 @@ class MainMenu(Menu):
         self.move_cursors()
         if self.game.START_KEY:
             if self.state == 'Start':
+                
                 self.game.playing = True
             elif self.state == 'Controls':
                 pass

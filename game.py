@@ -1,8 +1,5 @@
 import pygame
-from menu import MainMenu
-from menu import LoginMenu
-from menu import RegisterMenu
-from menu import SignInMenu
+from menu import *
 
 class Game():
     """ Attributes """
