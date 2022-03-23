@@ -1,5 +1,5 @@
 import pygame
-
+from databse import * 
 
 class Menu():
     """ Base Menu Class inherited by other Menus """
@@ -17,6 +17,7 @@ class Menu():
         self.inp_repass = ''
         self.hidden_pass = ''
         self.hidden_repass = ''
+        self.DatabaseActions = DatabaseActions(self)
 
     """ Methods """
     def draw_cursors(self):
@@ -191,7 +192,8 @@ class SignInMenu(Menu):
         self.move_cursors()
         if self.game.START_KEY:
             if self.state == 'Login':      # not exiting back rto login menu and not going to game once login is pressed
-                self.inp_pass = ''
+                self.DatabaseActions.check_login()
+                """self.inp_pass = ''
                 self.inp_username = ''
                 self.inp_repass = ''
                 self.game.login = False
@@ -199,7 +201,7 @@ class SignInMenu(Menu):
                 self.game.running = True
                 self.game.playing = False
                 self.game.register = False
-                self.game.signin = False
+                self.game.signin = False"""
             elif self.state == 'Exit':
                 self.inp_pass = ''
                 self.inp_username = ''
@@ -311,10 +313,11 @@ class RegisterMenu(Menu):
         self.move_cursors()
         if self.game.START_KEY:
             if self.state == 'Register':
-                self.inp_pass = ''
+                self.DatabaseActions.create_username()
+                """self.inp_pass = ''
                 self.inp_username = ''
                 self.inp_repass = ''
-                pass
+                pass"""
             elif self.state == 'Exit':
                 self.game.intro = False
                 self.game.running = False

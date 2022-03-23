@@ -1,5 +1,6 @@
 from game import Game
 
+
 g = Game()
 while g.login:
     g.login_menu.display_menu()
