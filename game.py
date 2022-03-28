@@ -1,12 +1,13 @@
 import pygame
+from pygame.math import Vector2 as vec
 from menu import *
+from player_class import *
 
 class Game():
     """ Attributes """
     def __init__(self):
         pygame.init()
         self.login = True
-        self.intro = True
         self.running = False
         self.playing = False
         self.register = False
@@ -20,6 +21,11 @@ class Game():
         self.UNICODE_KEY = False
         self.DISPLAY_W = 480*1.5
         self.DISPLAY_H = 270*1.5 #remoed times 2
+        self.MAZE_W = 364
+        self.MAZE_H = 403
+        self.PLAYER_START = vec(1,1)
+        self.CELL_W = self.MAZE_W // 28
+        self.CELL_H = self.MAZE_H // 30
         self.unicode_text = ''
         self.display = pygame.display.set_mode((self.DISPLAY_H, self.DISPLAY_W))
         self.window = pygame.display.set_mode(((self.DISPLAY_W,self.DISPLAY_H)))
@@ -27,10 +33,13 @@ class Game():
         self.font_name_8bit = '8-BIT WONDER.TTF'
         self.BLACK = (0,0,0)
         self.WHITE = (255,255,255)
+        self.GREY = (107,107,107)
         self.main_menu = MainMenu(self)                                                                         #refrence main menu object
         self.register_menu = RegisterMenu(self)
         self.login_menu = LoginMenu(self)                                                                        #enables current menu to be chanegd depenfin gon whats selected
         self.signin_menu = SignInMenu(self)
+        self.player = Player(self, self.PLAYER_START)
+        self.load()
 
     """ Methods """
     def game_loop(self):
@@ -38,11 +47,27 @@ class Game():
             self.check_events()
             if self.START_KEY:                                                                                  #enter key to pause and unpause
                 self.playing = True
-            self.display.fill(self.BLACK)                                                                       # gets rid of images by ressting screen
-            self.draw_text('THis is where the game will be ', 20, self.DISPLAY_W/2, self.DISPLAY_H/2)
-            self.window.blit(self.display, (0,0)) #
+            self.playing_draw()                                                            # gets rid of images by ressting screen
+            self.load() #
             pygame.display.update()                                                                             # moves image onto screen
             self.reset_keys()
+
+    def playing_draw(self):
+        self.display.fill(self.BLACK)           
+        self.display.blit(self.background, (0,0))                                                            # gets rid of images by ressting screen
+        self.draw_grid()
+        self.player.draw()
+
+
+    def load(self):
+        self.background = pygame.image.load('backgroundMaze.png')
+        self.background = pygame.transform.scale(self.background, (self.MAZE_W, self.MAZE_H))
+
+    def draw_grid(self):
+        for x in range(self.MAZE_W//self.CELL_W):
+            pygame.draw.line(self.display, self.GREY, (x*self.CELL_W, 0), (x*self.CELL_W, self.MAZE_H))
+        for x in range(self.MAZE_H//self.CELL_H):
+            pygame.draw.line(self.display, self.GREY, (0, x*self.CELL_H), ( self.MAZE_W,x*self.CELL_H))
            
     def check_events(self):
         """ Method to check whenever user enters a key """

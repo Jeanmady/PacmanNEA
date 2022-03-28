@@ -1,5 +1,6 @@
 import pygame
 from databse import * 
+import time
 
 class Menu():
     """ Base Menu Class inherited by other Menus """
@@ -193,26 +194,31 @@ class SignInMenu(Menu):
         if self.game.START_KEY:
             if self.state == 'Login':      # not exiting back rto login menu and not going to game once login is pressed
                 self.DatabaseActions.check_login()
-                """self.inp_pass = ''
-                self.inp_username = ''
-                self.inp_repass = ''
-                self.game.login = False
-                self.game.intro = False
-                self.game.running = True
-                self.game.playing = False
-                self.game.register = False
-                self.game.signin = False"""
+                if self.DatabaseActions.check_login() == True:
+                    self.game.draw_text_8bit('Login Accepted', 15, self.usernamex , self.usernamey -100)
+                    self.blit_screen()
+                    time.sleep(3)
+                    self.inp_pass = ''
+                    self.inp_username = ''
+                    self.inp_repass = ''
+                    self.game.login = False
+                    self.game.intro = False
+                    self.game.running = True
+                    self.game.playing = False
+                    self.game.register = False
+                    self.game.signin = False
             elif self.state == 'Exit':
                 self.inp_pass = ''
                 self.inp_username = ''
                 self.inp_repass = ''
-                self.game.login = True
-                self.game.intro = True
-                self.game.running = False
-                self.game.playing = False
-                self.game.register = False
-                self.game.signin = False
+                self.login = True
+                self.intro = True
+                self.running = False
+                self.playing = False
+                self.register = False
+                self.signin = False
             self.run_display = False
+            
 
 class RegisterMenu(Menu):
     """ Class to create Register Sub Menu for Login Menu Class """
@@ -314,10 +320,10 @@ class RegisterMenu(Menu):
         if self.game.START_KEY:
             if self.state == 'Register':
                 self.DatabaseActions.create_username()
-                """self.inp_pass = ''
+                self.inp_pass = ''
                 self.inp_username = ''
                 self.inp_repass = ''
-                pass"""
+                
             elif self.state == 'Exit':
                 self.game.intro = False
                 self.game.running = False
@@ -327,9 +333,9 @@ class RegisterMenu(Menu):
                 self.inp_pass = ''
                 self.inp_username = ''
                 self.inp_repass = ''
-            self.run_display = False
+                self.run_display = False
 
-class MainMenu(Menu):
+class MainMenu(Menu, DatabaseActions):
     """ Attributes """
     def __init__(self, game):
         Menu.__init__(self, game) #gets all variables form menu class
@@ -341,6 +347,7 @@ class MainMenu(Menu):
         self.exitx, self.exity = self.mid_w, self.mid_h + 110
         self.cursor_rect_left.midtop = (self.startx + self.offset_left, self.starty)
         self.cursor_rect_right.midtop = (self.startx + self.offset_right, self.starty)
+        self.highscore = DatabaseActions.currentHighscore
 
     def display_menu(self):
         """ Method to display Menu onto the screen """
@@ -349,8 +356,8 @@ class MainMenu(Menu):
             self.game.check_events()
             self.check_input()
             self.game.display.fill(self.game.BLACK)
-            self.game.draw_text('Highscore', 15, 75,10)
-            #highscore acc score here
+            self.game.draw_text_bottom_left('HIGHSCORE:', 16, 5,10)
+            self.game.draw_text_bottom_left((self.highscore), 16, 20,10)
             self.game.draw_text_8bit('Main Menu', 20, self.mid_w, self.mid_h - 20)
             self.game.draw_text_8bit("Begin Game", 20, self.startx, self.starty)
             self.game.draw_text_8bit("Game Controls", 20, self.controlsx, self.controlsy)

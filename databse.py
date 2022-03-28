@@ -39,8 +39,13 @@ conn.close()
 
 
 class DatabaseActions():
+    currentHighscore = ''
+    currentID = ''
     def __init__(self, menu):
         self.menu = menu
+        
+        
+
 
     def create_username(self):
         conn = sql.connect('usernamedatabase')
@@ -54,10 +59,10 @@ class DatabaseActions():
         else:
             print("lol")
             c.execute(""" INSERT INTO Users
-                        (Username, Password)
+                        (Username, Password, Highscore)
                         VALUES
-                        (?,?)
-                        """,(self.menu.inp_username, self.menu.inp_repass))
+                        (?,?,?)
+                        """,(self.menu.inp_username, self.menu.inp_repass, '0'))
             
         
             conn.commit()
@@ -76,9 +81,25 @@ class DatabaseActions():
             print('Username does not exists')# add error messege
         if str(self.menu.inp_pass) == acc_pass:
             print("accepted")
+            c.execute("SELECT UserID FROM Users WHERE Username = ?", (self.menu.inp_username,))
+            data=c.fetchall()
+            print(data)
+            data = str(data)
+            DatabaseActions.currentID = data[2:-3]
+            self.get_highscore()
+            return True
         else:
             print("incorrect password")
         conn.close()
+
+    def get_highscore(self):
+        conn = sql.connect('usernamedatabase')
+        c = conn.cursor()
+        c.execute("SELECT Highscore FROM Users WHERE UserID = ?", (DatabaseActions.currentID))
+        data=c.fetchall()
+        data = str(data)
+        DatabaseActions.currentHighscore = data[2:-3]
+
             
             
 
