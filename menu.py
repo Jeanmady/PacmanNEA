@@ -6,14 +6,14 @@ class Menu():
     """ Base Menu Class inherited by other Menus """
     """ Attributes """
     def __init__(self, game):
-        self.game = game                                                                                   # Takes the game class attributes to make them accessible in the menu class
-        self.mid_w, self.mid_h = self.game.DISPLAY_W / 2, self.game.DISPLAY_H / 2                          # Cakcukates and stores centre values in the display
-        self.run_display = True                                                                            # Boolean variab;e used in method display_menu
-        self.cursor_rect_left = pygame.Rect(0,0,20,20)                                                     # 20 by 20 square as a cursor for left hand side
-        self.offset_left = -150                                                                            # moves cursor to the left
-        self.cursor_rect_right = pygame.Rect(0,0,20,20)                                                    # 20 by 20 square as a cursor for right hand side
-        self.offset_right = 150                                                                            # moves cursor to the right
-        self.inp_username = ''
+        self.game = game      # Takes the game class attributes to make them accessible in the menu class
+        self.mid_w, self.mid_h = self.game.DISPLAY_W / 2, self.game.DISPLAY_H / 2      # Cakcukates and stores centre values in the display
+        self.run_display = True     # Boolean variab;e used in method display_menu
+        self.cursor_rect_left = pygame.Rect(0,0,20,20)     # 20 by 20 square as a cursor for left hand side
+        self.offset_left = -150     # moves cursor to the left
+        self.cursor_rect_right = pygame.Rect(0,0,20,20)    # 20 by 20 square as a cursor for right hand side
+        self.offset_right = 150    # moves cursor to the right
+        self.inp_username = ''  # these are all the stores for inputs on different menus 
         self.inp_pass = ''
         self.inp_repass = ''
         self.hidden_pass = ''
@@ -32,12 +32,12 @@ class Menu():
         pygame.display.update()
         self.game.reset_keys()
 
-class LoginMenu(Menu):
+class StartUpMenu(Menu):
     """ Attributes """
     def __init__(self, game):
-        Menu.__init__(self, game)                                                                          # gets all variables from menu class
-        self.state = "Login"                                                                               # sets initial position of cursour to be login as its the fisrt item
-        self.loginx, self.loginy = self.mid_w, self.mid_h + 10
+        Menu.__init__(self, game)       # gets all variables from menu class using inheritance
+        self.state = "Login"           # sets initial position of cursour to be login as its the fisrt item
+        self.loginx, self.loginy = self.mid_w, self.mid_h + 10  # variables to help with positioning of text
         self.registerx, self.registery = self.mid_w, self.mid_h + 30
         self.exitx, self.exity = self.mid_w, self.mid_h + 50
         self.cursor_rect_left.midtop = (self.loginx + self.offset_left, self.loginy)
@@ -50,6 +50,7 @@ class LoginMenu(Menu):
             self.game.check_events()
             self.check_input()
             self.game.display.fill(self.game.BLACK)
+            self.game.draw_text_Pacmanio('Pacmanio', 60, self.mid_w, self.mid_h / 2 )
             self.game.draw_text_8bit('Login', 20, self.loginx, self.loginy)
             self.game.draw_text_8bit("Register", 20, self.registerx, self.registery)
             self.game.draw_text_8bit("Exit", 20, self.exitx, self.exity)
@@ -83,6 +84,7 @@ class LoginMenu(Menu):
 
     def check_input(self):
         """ Checks for user input on keyboard """
+        # helps keep knowledge of where the cursor is
         self.move_cursors()
         if self.game.START_KEY:
             if self.state == 'Login':
@@ -92,7 +94,6 @@ class LoginMenu(Menu):
                 self.game.playing = False
                 self.game.register = False
                 self.game.login = False
-               #add: to after signin self.game.running = True    #here shoud add functions to do with the login proccesss
             elif self.state == 'Register':
                 self.game.signin = False
                 self.game.intro = False

@@ -1,19 +1,23 @@
 import pygame
-from pygame.math import Vector2 as vec
-from menu import *
-from player_class import *
 
 class Game():
     """ Attributes """
     def __init__(self):
         pygame.init()
         self.login = True
-        self.running, self.playing, self.register, self.signin = False, False, False, False  #state boolean variables
-        #boolean variables for user input
-        self.UP_KEY, self.DOWN_KEY, self.START_KEY, self.BACK_KEY, self.RIGHT_KEY, self.LEFT_KEY, self.UNICODE_KEY = False, False, False, False, False, False, False 
+        self.running = False
+        self.playing = False
+        self.register = False
+        self.signin = False
+        self.UP_KEY = False
+        self.DOWN_KEY = False
+        self.START_KEY = False
+        self.BACK_KEY = False
+        self.RIGHT_KEY = False
+        self.LEFT_KEY = False
         self.UNICODE_KEY = False
         self.DISPLAY_W = 480*1.5
-        self.DISPLAY_H = 270*1.5 
+        self.DISPLAY_H = 270*1.5 #remoed times 2
         self.MAZE_W = 364
         self.MAZE_H = 403
         self.PLAYER_START = vec(1,1)
@@ -25,66 +29,17 @@ class Game():
         self.font_name_defult = pygame.font.Font(None, 20)   
         self.font_name_8bit = '8-BIT WONDER.TTF'
         self.font_name_pacmanio = 'PacmanioFont.TTF'
-        self.BLACK, self.WHITE, self.GREY = (0,0,0), (255,255,255), (107,107,107)
-        self.main_menu = MainMenu(self)     #refrence main menu object
+        self.BLACK = (0,0,0)
+        self.WHITE = (255,255,255)
+        self.GREY = (107,107,107)
+        self.main_menu = MainMenu(self)                                                                         #refrence main menu object
         self.register_menu = RegisterMenu(self)
-        self.login_menu = StartUpMenu(self)         #enables current menu to be chanegd depenfin gon whats selected
+        self.login_menu = StartUpMenu(self)                                                                        #enables current menu to be chanegd depenfin gon whats selected
         self.signin_menu = SignInMenu(self)
         self.player = Player(self, self.PLAYER_START)
-        self.clock = pygame.time.Clock()
         self.load()
 
     """ Methods """
-    def game_loop(self):
-        while self.playing:
-            self.playing_events()
-            if self.START_KEY:                                                        
-                self.playing = True
-            self.clock.tick(60)
-            self.playing_draw()    # gets rid of images by ressting screen
-            self.player.update()
-            self.load() #
-            pygame.display.update()     # moves image onto screen
-            self.reset_keys()  # calls reset keys function
-
-    def playing_draw(self):
-        self.display.fill(self.BLACK)           
-        self.display.blit(self.background, (0,0))        # gets rid of images by ressting screen
-        self.draw_grid()
-        self.player.draw()
-
-    def load(self): # loads backgrounds
-        self.background = pygame.image.load('backgroundMaze.png')
-        self.background = pygame.transform.scale(self.background, (self.MAZE_W, self.MAZE_H))
-
-    def draw_grid(self):
-        for x in range(self.MAZE_W//self.CELL_W):
-            pygame.draw.line(self.display, self.GREY, (x*self.CELL_W, 0), (x*self.CELL_W, self.MAZE_H))
-        for x in range(self.MAZE_H//self.CELL_H):
-            pygame.draw.line(self.display, self.GREY, (0, x*self.CELL_H), ( self.MAZE_W,x*self.CELL_H))
-
-    def playing_events(self):
-        for event in pygame.event.get():                                                                        #goes through a list of everything player can do on computer
-            if event.type == pygame.QUIT:                                                                       #checks if user closes window
-                self.login = False
-                self.intro = False
-                self.running = False
-                self.playing = False
-                self.register = False
-                self.signin = False
-                self.login_menu.run_display = False
-                self.register_menu.run_display = False
-                self.main_menu.run_display = False
-            if event.type == pygame.KEYDOWN:                                                                    #checks if user presses something on keyboard
-                if event.key == pygame.K_DOWN:
-                    self.player.move(vec(0,1))
-                if event.key == pygame.K_UP:
-                    self.player.move(vec(0,-1))
-                if event.key == pygame.K_LEFT:
-                    self.player.move(vec(-1,0))
-                if event.key == pygame.K_RIGHT:
-                    self.player.move(vec(1,0))
-                 
     def check_events(self):
         """ Method to check whenever user enters a key """
         for event in pygame.event.get():      #goes through a list of everything player can do on computer
