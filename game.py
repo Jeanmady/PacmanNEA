@@ -15,8 +15,8 @@ class Game():
         self.UNICODE_KEY = False
         self.DISPLAY_W = 480*1.5
         self.DISPLAY_H = 270*1.5 
-        self.MAZE_W = 364
-        self.MAZE_H = 403
+        self.MAZE_W = 560
+        self.MAZE_H = 620
         self.PLAYER_START = vec(1,1)
         self.CELL_W = self.MAZE_W // 28
         self.CELL_H = self.MAZE_H // 30
@@ -39,6 +39,7 @@ class Game():
     """ Methods """
     def game_loop(self):
         while self.playing:
+            self.display = pygame.display.set_mode((610, 670))
             self.playing_events()
             if self.START_KEY:                                                        
                 self.playing = True
@@ -50,10 +51,11 @@ class Game():
             self.clock.tick(60)
 
     def playing_draw(self):
-        self.display.fill(self.BLACK)           
-        self.display.blit(self.background, (0,0))        # gets rid of images by ressting screen
-        self.draw_grid()
-        self.player.draw()
+        self.display.fill(self.BLACK)
+        self.display.blit(self.background, (self.TOP_BOTTOM_BUFFER//2, self.TOP_BOTTOM_BUFFER//2))              
+        #self.draw_grid() # add writing and text in here ~~~~~~ REMOVE HASHTAG TO DRAW GRID
+        self.player.draw()    
+        pygame.display.update()
 
     def load(self): # loads backgrounds
         self.background = pygame.image.load('backgroundMaze.png')
@@ -67,13 +69,13 @@ class Game():
 
 
 
-    def draw_grid(self):
+    """def draw_grid(self):
         for x in range(self.MAZE_W//self.CELL_W):
             pygame.draw.line(self.background, self.GREY, (x*self.CELL_W, 0), (x*self.CELL_W, self.MAZE_H))
         for x in range(self.MAZE_H//self.CELL_H):
             pygame.draw.line(self.background, self.GREY, (0, x*self.CELL_H), ( self.MAZE_W,x*self.CELL_H))
-        """for wall in self.walls:
-            pygame.draw.rect(self.display, (112, 55, 163), (wall.x*self.CELL_W, wall.y*self.CELL_H, self.CELL_H, self.CELL_H))"""
+        for wall in self.walls:
+            pygame.draw.rect(self.background, (112, 55, 163), (wall.x*self.CELL_W, wall.y*self.CELL_H, self.CELL_H, self.CELL_H))"""
 
     def playing_events(self):
         for event in pygame.event.get():                                                                        #goes through a list of everything player can do on computer
