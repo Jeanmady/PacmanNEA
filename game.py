@@ -11,6 +11,7 @@ class Game():
         self.running, self.playing, self.register, self.signin = False, False, False, False  #state boolean variables
         #boolean variables for user input
         self.UP_KEY, self.DOWN_KEY, self.START_KEY, self.BACK_KEY, self.RIGHT_KEY, self.LEFT_KEY, self.UNICODE_KEY = False, False, False, False, False, False, False 
+        self.TOP_BOTTOM_BUFFER = 50
         self.UNICODE_KEY = False
         self.DISPLAY_W = 480*1.5
         self.DISPLAY_H = 270*1.5 
@@ -32,6 +33,7 @@ class Game():
         self.signin_menu = SignInMenu(self)
         self.player = Player(self, self.PLAYER_START)
         self.clock = pygame.time.Clock()
+        self.walls = []
         self.load()
 
     """ Methods """
@@ -40,12 +42,12 @@ class Game():
             self.playing_events()
             if self.START_KEY:                                                        
                 self.playing = True
-            self.clock.tick(60)
             self.playing_draw()    # gets rid of images by ressting screen
             self.player.update()
             self.load() #
             pygame.display.update()     # moves image onto screen
             self.reset_keys()  # calls reset keys function
+            self.clock.tick(60)
 
     def playing_draw(self):
         self.display.fill(self.BLACK)           
@@ -57,11 +59,21 @@ class Game():
         self.background = pygame.image.load('backgroundMaze.png')
         self.background = pygame.transform.scale(self.background, (self.MAZE_W, self.MAZE_H))
 
+        with open("walls.txt", 'r') as file:   #openeing walls file
+            for yidx, line in enumerate(file):   # creating the walls list using coords of the walls in txt file
+                for xidx, char in enumerate(line):
+                    if char == "1":
+                        self.walls.append(vec(xidx, yidx))  # then it srtores it as a vector
+
+
+
     def draw_grid(self):
         for x in range(self.MAZE_W//self.CELL_W):
-            pygame.draw.line(self.display, self.GREY, (x*self.CELL_W, 0), (x*self.CELL_W, self.MAZE_H))
+            pygame.draw.line(self.background, self.GREY, (x*self.CELL_W, 0), (x*self.CELL_W, self.MAZE_H))
         for x in range(self.MAZE_H//self.CELL_H):
-            pygame.draw.line(self.display, self.GREY, (0, x*self.CELL_H), ( self.MAZE_W,x*self.CELL_H))
+            pygame.draw.line(self.background, self.GREY, (0, x*self.CELL_H), ( self.MAZE_W,x*self.CELL_H))
+        """for wall in self.walls:
+            pygame.draw.rect(self.display, (112, 55, 163), (wall.x*self.CELL_W, wall.y*self.CELL_H, self.CELL_H, self.CELL_H))"""
 
     def playing_events(self):
         for event in pygame.event.get():                                                                        #goes through a list of everything player can do on computer
