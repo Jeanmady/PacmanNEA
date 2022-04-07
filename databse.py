@@ -87,7 +87,7 @@ class DatabaseActions():
             print(data)
             data = str(data)
             DatabaseActions.currentID = data[2:-3]
-            self.get_highscore()
+            Highscore = self.get_highscore()
             return True
         else:
             print("incorrect password")
@@ -100,6 +100,8 @@ class DatabaseActions():
         data=c.fetchall()
         data = str(data)
         DatabaseActions.currentHighscore = data[2:-3]
+        print(data)
+        return data
 
             
             

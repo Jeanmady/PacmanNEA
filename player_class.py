@@ -1,6 +1,8 @@
 import pygame
 from pygame.math import *
 vec = pygame.math.Vector2
+
+
 class Player:
     def __init__(self, game, pos):
         self.PLAYER_C = (190,194,15)
@@ -26,6 +28,12 @@ class Player:
                             self.game.CELL_W//2)//self.game.CELL_W+1                              #setting grid position in refernce to pixel position
         self.grid_pos[1] = (self.pix_pos[1]-self.game.TOP_BOTTOM_BUFFER + 
                             self.game.CELL_H//2)//self.game.CELL_H+1
+
+        if self.on_object(self.game.pellet):
+            self.eat_object(self.game.pellet)
+
+        elif self.on_object(self.game.super_pellet):
+            self.eat_object(self.game.super_pellet)
     
     def draw(self):
         pygame.draw.circle(self.game.display, self.PLAYER_C, (int(self.pix_pos.x), int(self.pix_pos.y)), self.game.CELL_W//2+2)
@@ -50,6 +58,33 @@ class Player:
             if vec(self.grid_pos + self.direction) == wall:
                 return False
         return True
+
+       
+    def on_object(self, item):
+        if self.grid_pos in item:
+            item.remove(self.grid_pos)
+            
+
+    def eat_object(self, item):
+        pass
+
+    def grace_fruit(self):
+        pass
+
+    def freeze_fruit(self):
+        pass
+
+    def super_pellets(self):
+        for super_pellets in self.game.super_pellet:
+            pygame.draw.circle(self.game.display, self.game.BABY_BLUE, (int(super_pellets.x*self.game.CELL_W)+ self.game.CELL_W//2+self.game.TOP_BOTTOM_BUFFER//2,
+                                                                       int(super_pellets.y*self.game.CELL_H)+self.game.CELL_H//2+self.game.TOP_BOTTOM_BUFFER//2), 5) 
+        
+
+    def pellets(self):
+        for pellets in self.game.pellet:
+            pygame.draw.circle(self.game.display, self.game.WHITE, (int(pellets.x*self.game.CELL_W)+ self.game.CELL_W//2+self.game.TOP_BOTTOM_BUFFER//2,
+                                                                       int(pellets.y*self.game.CELL_H)+self.game.CELL_H//2+self.game.TOP_BOTTOM_BUFFER//2), 3) 
+        
 
         
     

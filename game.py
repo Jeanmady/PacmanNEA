@@ -2,7 +2,7 @@ import pygame
 from pygame.math import Vector2 as vec
 from menu import *
 from player_class import *
-from objects_class import *
+
 
 class Game():
     """ Attributes """
@@ -38,19 +38,23 @@ class Game():
         self.clock = pygame.time.Clock()
         self.walls, self.pellet, self.super_pellet = [], [], []
         self.load()
-        self.object = Objects(self)
+        
 
     """ Methods """
-    def game_loop(self):
+    def game_loop(self): # This runs the whole program checking th e main state to see what is running and chabges it when the mainstate changes
         while self.running:
             if self.mainstate == 'startup':
                 self.startup_menu.display_menu()
+
             elif self.mainstate == 'register':
                 self.register_menu.display_menu()
+
             elif self.mainstate == 'login':
                 self.signin_menu.display_menu()
+
             elif self.mainstate == 'mainmenu':
                 self.main_menu.display_menu()
+
             elif self.mainstate == 'playing':
                 self.display = pygame.display.set_mode((610, 670))
                 self.playing_events()
@@ -157,7 +161,8 @@ class Game():
 
     def playing_events(self):
             for event in pygame.event.get():                                                                        #goes through a list of everything player can do on computer
-                if event.type == pygame.QUIT:                                                                      self.running = False
+                if event.type == pygame.QUIT:
+                    self.running = False
                 if event.type == pygame.KEYDOWN:                                                                    #checks if user presses something on keyboard
                     if event.key == pygame.K_DOWN:
                         self.player.move(vec(0,1))
@@ -174,8 +179,8 @@ class Game():
     def playing_draw(self):
         self.display.fill(self.BLACK)
         self.display.blit(self.background, (self.TOP_BOTTOM_BUFFER//2, self.TOP_BOTTOM_BUFFER//2))      
-        self.object.pellets()
-        self.object.super_pellets()        
+        self.player.pellets()
+        self.player.super_pellets()        
         #self.draw_grid() # add writing and text in here ~~~~~~ REMOVE HASHTAG TO DRAW GRID
         self.player.draw()
         self.playing_updates()    
