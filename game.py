@@ -46,7 +46,7 @@ class Game():
             if self.START_KEY:                                                        
                 self.playing = True
             self.playing_draw()    # gets rid of images by ressting screen
-            self.player.update()
+            #self.player.update()
             self.load() #
             pygame.display.update()     # moves image onto screen
             self.reset_keys()  # calls reset keys function
@@ -54,12 +54,14 @@ class Game():
 
     def playing_draw(self):
         self.display.fill(self.BLACK)
+        self.display.blit(self.background, (self.TOP_BOTTOM_BUFFER//2, self.TOP_BOTTOM_BUFFER//2))      
         self.object.pellets()
-        self.object.super_pellets()
-        self.display.blit(self.background, (self.TOP_BOTTOM_BUFFER//2, self.TOP_BOTTOM_BUFFER//2))              
+        self.object.super_pellets()        
         #self.draw_grid() # add writing and text in here ~~~~~~ REMOVE HASHTAG TO DRAW GRID
-        self.player.draw()    
+        self.player.draw()
+        self.playing_updates()    
         pygame.display.update()
+        
 
     def load(self): # loads backgrounds
         self.background = pygame.image.load('backgroundMaze.png')
@@ -105,6 +107,9 @@ class Game():
                     self.player.move(vec(-1,0))
                 if event.key == pygame.K_RIGHT:
                     self.player.move(vec(1,0))
+
+    def playing_updates(self):
+        self.player.update()
                  
     def check_events(self):
         """ Method to check whenever user enters a key """
