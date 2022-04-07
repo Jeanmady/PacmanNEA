@@ -88,30 +88,13 @@ class StartUpMenu(Menu):
         self.move_cursors()
         if self.game.START_KEY:
             if self.state == 'Login':
-                self.game.signin = True
-                self.game.intro = False
-                self.game.running = False
-                self.game.playing = False
-                self.game.register = False
-                self.game.login = False
+                self.game.mainstate = 'login'
             elif self.state == 'Register':
-                self.game.signin = False
-                self.game.intro = False
-                self.game.running = False
-                self.game.playing = False
-                self.game.register = True
-                self.game.login = False
+                self.game.mainstate = 'register'
             elif self.state == 'Exit':
-                self.game.login = False
-                self.game.intro = False
                 self.game.running = False
-                self.game.playing = False
-                self.game.register = False
-                self.game.signin = False
-                self.game.login_menu.run_display = False
-                self.game.register_menu.run_display = False
-                self.game.main_menu.run_display = False
             self.run_display = False
+
 
 class SignInMenu(Menu):
     """ Class to create Sign In sub Menu for Login Page """     
@@ -202,22 +185,14 @@ class SignInMenu(Menu):
                     self.inp_pass = ''
                     self.inp_username = ''
                     self.inp_repass = ''
-                    self.game.login = False
-                    self.game.intro = False
-                    self.game.running = True
-                    self.game.playing = False
-                    self.game.register = False
-                    self.game.signin = False
+                    self.game.mainstate = 'mainmenu'
             elif self.state == 'Exit':
                 self.inp_pass = ''
                 self.inp_username = ''
                 self.inp_repass = ''
-                self.login = True
-                self.intro = True
-                self.running = False
-                self.playing = False
-                self.register = False
-                self.signin = False
+                self.hidden_pass = ''
+                self.hidden_repass = ''
+                self.game.mainstate = 'startup'
             self.run_display = False
             
 
@@ -321,20 +296,20 @@ class RegisterMenu(Menu):
         if self.game.START_KEY:
             if self.state == 'Register':
                 self.DatabaseActions.create_username()
-                self.inp_pass = ''
-                self.inp_username = ''
-                self.inp_repass = ''
+                if self.DatabaseActions.create_username():
+                    self.inp_pass = ''
+                    self.inp_username = ''
+                    self.inp_repass = ''
+                    self.game.mainstate = 'startup'
+                #dfhsyhayh add sttuff to show regusetred
                 
             elif self.state == 'Exit':
-                self.game.intro = False
-                self.game.running = False
-                self.game.playing = False
-                self.game.register = False
-                self.game.login = True
                 self.inp_pass = ''
                 self.inp_username = ''
                 self.inp_repass = ''
-                self.run_display = False
+                self.hidden_pass = ''
+                self.game.mainstate = 'startup'
+            self.run_display = False
 
 class MainMenu(Menu, DatabaseActions):
     """ Attributes """
@@ -364,7 +339,7 @@ class MainMenu(Menu, DatabaseActions):
             self.game.draw_text_8bit("Game Controls", 20, self.controlsx, self.controlsy)
             self.game.draw_text_8bit("Add Friends", 20, self.friendsx, self.friendsy)
             self.game.draw_text_8bit("Score Boards", 20, self.boardsx, self.boardsy)
-            self.game.draw_text_8bit("Exit Game", 20, self.exitx, self.exity)
+            self.game.draw_text_8bit("Log out", 20, self.exitx, self.exity)
             self.draw_cursors()
             self.blit_screen()
 
@@ -416,8 +391,7 @@ class MainMenu(Menu, DatabaseActions):
         self.move_cursors()
         if self.game.START_KEY:
             if self.state == 'Start':
-                
-                self.game.playing = True
+                self.game.mainstate = 'playing'
             elif self.state == 'Controls':
                 pass
             elif self.state == 'Friends':
@@ -425,7 +399,7 @@ class MainMenu(Menu, DatabaseActions):
             elif self.state == 'Boards':
                 pass
             elif self.state == 'Exit':
-                self.game.intro, self.game.running, self.game.playing, self.game.register, self.game.login = False, False, False, False, False
+                self.game.mainstate = 'startup'
             self.run_display = False
 
 class GameControls(Menu):

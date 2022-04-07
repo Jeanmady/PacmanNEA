@@ -57,12 +57,13 @@ class DatabaseActions():
         elif self.menu.inp_repass != self.menu.inp_pass:
             print("Passwords dont match")# add error message
         else:
-            print("lol")
+            print("created")
             c.execute(""" INSERT INTO Users
                         (Username, Password, Highscore)
                         VALUES
                         (?,?,?)
                         """,(self.menu.inp_username, self.menu.inp_repass, '0'))
+            return True
             
         
             conn.commit()

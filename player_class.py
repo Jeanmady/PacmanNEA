@@ -28,7 +28,7 @@ class Player:
                             self.game.CELL_H//2)//self.game.CELL_H+1
     
     def draw(self):
-        pygame.draw.circle(self.game.display, self.PLAYER_C, (int(self.pix_pos.x), int(self.pix_pos.y)), self.game.CELL_W//2-2)
+        pygame.draw.circle(self.game.display, self.PLAYER_C, (int(self.pix_pos.x), int(self.pix_pos.y)), self.game.CELL_W//2+2)
         #draws the rectangle for the position of player
         """pygame.draw.rect(self.game.display, self.RED, (self.grid_pos[0] * self.game.CELL_W+self.game.TOP_BOTTOM_BUFFER//2, 
                                                         self.grid_pos[1] * self.game.CELL_H+self.game.TOP_BOTTOM_BUFFER//2, 

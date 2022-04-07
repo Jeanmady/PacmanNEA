@@ -9,10 +9,12 @@ class Game():
     def __init__(self):
         pygame.init()
         self.login = True
-        self.running, self.playing, self.register, self.signin = False, False, False, False  #state boolean variables
+        self.running = True #state boolean variables
         #boolean variables for user input
+        self.mainstate = 'startup'
         self.UP_KEY, self.DOWN_KEY, self.START_KEY, self.BACK_KEY, self.RIGHT_KEY, self.LEFT_KEY, self.UNICODE_KEY = False, False, False, False, False, False, False 
         self.TOP_BOTTOM_BUFFER = 50
+        self.FPS = 60
         self.UNICODE_KEY = False
         self.DISPLAY_W = 480*1.5
         self.DISPLAY_H = 270*1.5 
@@ -30,7 +32,7 @@ class Game():
         self.BLACK, self.WHITE, self.GREY, self.BABY_BLUE = (0,0,0), (255,255,255), (107,107,107), (137,207,240)
         self.main_menu = MainMenu(self)     #refrence main menu object
         self.register_menu = RegisterMenu(self)
-        self.login_menu = StartUpMenu(self)         #enables current menu to be chanegd depenfin gon whats selected
+        self.startup_menu = StartUpMenu(self)         #enables current menu to be chanegd depenfin gon whats selected
         self.signin_menu = SignInMenu(self)
         self.player = Player(self, self.PLAYER_START)
         self.clock = pygame.time.Clock()
@@ -40,28 +42,36 @@ class Game():
 
     """ Methods """
     def game_loop(self):
-        while self.playing:
-            self.display = pygame.display.set_mode((610, 670))
-            self.playing_events()
-            if self.START_KEY:                                                        
-                self.playing = True
-            self.playing_draw()    # gets rid of images by ressting screen
-            #self.player.update()
-            self.load() #
-            pygame.display.update()     # moves image onto screen
-            self.reset_keys()  # calls reset keys function
-            self.clock.tick(60)
+        while self.running:
+            if self.mainstate == 'startup':
+                self.startup_menu.display_menu()
+            elif self.mainstate == 'register':
+                self.register_menu.display_menu()
+            elif self.mainstate == 'login':
+                self.signin_menu.display_menu()
+            elif self.mainstate == 'mainmenu':
+                self.main_menu.display_menu()
+            elif self.mainstate == 'playing':
+                self.display = pygame.display.set_mode((610, 670))
+                self.playing_events()
+                self.playing_updates()
+                self.playing_draw()
 
-    def playing_draw(self):
-        self.display.fill(self.BLACK)
-        self.display.blit(self.background, (self.TOP_BOTTOM_BUFFER//2, self.TOP_BOTTOM_BUFFER//2))      
-        self.object.pellets()
-        self.object.super_pellets()        
-        #self.draw_grid() # add writing and text in here ~~~~~~ REMOVE HASHTAG TO DRAW GRID
-        self.player.draw()
-        self.playing_updates()    
-        pygame.display.update()
-        
+            elif self.state == 'game over':
+                pass
+            else:
+                self.running = False
+            self.clock.tick(self.FPS)
+
+################################# MULTIUSE HELPER FUNCTIONS #################################
+
+    def draw_grid(self):
+        for x in range(self.MAZE_W//self.CELL_W):
+            pygame.draw.line(self.background, self.GREY, (x*self.CELL_W, 0), (x*self.CELL_W, self.MAZE_H))
+        for x in range(self.MAZE_H//self.CELL_H):
+            pygame.draw.line(self.background, self.GREY, (0, x*self.CELL_H), ( self.MAZE_W,x*self.CELL_H))
+        for wall in self.walls:
+            pygame.draw.rect(self.background, (112, 55, 163), (wall.x*self.CELL_W, wall.y*self.CELL_H, self.CELL_H, self.CELL_H))
 
     def load(self): # loads backgrounds
         self.background = pygame.image.load('backgroundMaze.png')
@@ -76,80 +86,6 @@ class Game():
                         self.pellet.append(vec(xidx, yidx)) # here lin to function where we can randomly assign tiems to that spot
                     elif char == "S":
                         self.super_pellet.append(vec(xidx, yidx))
-                        
-
-    def draw_grid(self):
-        for x in range(self.MAZE_W//self.CELL_W):
-            pygame.draw.line(self.background, self.GREY, (x*self.CELL_W, 0), (x*self.CELL_W, self.MAZE_H))
-        for x in range(self.MAZE_H//self.CELL_H):
-            pygame.draw.line(self.background, self.GREY, (0, x*self.CELL_H), ( self.MAZE_W,x*self.CELL_H))
-        for wall in self.walls:
-            pygame.draw.rect(self.background, (112, 55, 163), (wall.x*self.CELL_W, wall.y*self.CELL_H, self.CELL_H, self.CELL_H))
-
-    def playing_events(self):
-        for event in pygame.event.get():                                                                        #goes through a list of everything player can do on computer
-            if event.type == pygame.QUIT:                                                                       #checks if user closes window
-                self.login = False
-                self.intro = False
-                self.running = False
-                self.playing = False
-                self.register = False
-                self.signin = False
-                self.login_menu.run_display = False
-                self.register_menu.run_display = False
-                self.main_menu.run_display = False
-            if event.type == pygame.KEYDOWN:                                                                    #checks if user presses something on keyboard
-                if event.key == pygame.K_DOWN:
-                    self.player.move(vec(0,1))
-                if event.key == pygame.K_UP:
-                    self.player.move(vec(0,-1))
-                if event.key == pygame.K_LEFT:
-                    self.player.move(vec(-1,0))
-                if event.key == pygame.K_RIGHT:
-                    self.player.move(vec(1,0))
-
-    def playing_updates(self):
-        self.player.update()
-                 
-    def check_events(self):
-        """ Method to check whenever user enters a key """
-        for event in pygame.event.get():      #goes through a list of everything player can do on computer
-            if event.type == pygame.QUIT:       #checks if user closes window
-                self.login = False
-                self.intro = False
-                self.running = False
-                self.playing = False
-                self.register = False
-                self.signin = False
-                self.login_menu.run_display = False
-                self.register_menu.run_display = False
-                self.main_menu.run_display = False
-            if event.type == pygame.KEYDOWN:          #checks if user presses something on keyboard
-                if event.key == pygame.K_RETURN:
-                    self.START_KEY = True
-                if event.key == pygame.K_BACKSPACE:
-                    self.BACK_KEY = True
-                if event.key == pygame.K_DOWN:
-                    self.DOWN_KEY = True
-                if event.key == pygame.K_UP:
-                    self.UP_KEY = True
-                if event.key == pygame.K_LEFT:
-                    self.LEFT_KEY = True
-                if event.key == pygame.K_RIGHT:
-                    self.RIGHT_KEY = True
-                else:
-                    self.UNICODE_KEY = True
-                    self.unicode_text = event.unicode          
-                    
-    def reset_keys(self):  
-        """ Method to reset keys """
-        self.UP_KEY = False
-        self.DOWN_KEY = False
-        self.START_KEY = False
-        self.BACK_KEY = False
-        self.LEFT_KEY = False
-        self.RIGHT_KEY = False
-        self.UNICODE_KEY = False
 
     def draw_text_8bit(self, text, size, x,y):   #try add left organisatoion in order to block fonts later down the line   16/03/22
         """ Method to draw text using 8bit font """
@@ -182,5 +118,71 @@ class Game():
         text_rect = text_surface.get_rect()
         text_rect.midleft = (x,y)
         self.display.blit(text_surface, text_rect)
+
+    def reset_keys(self):  
+        """ Method to reset keys """
+        self.UP_KEY = False
+        self.DOWN_KEY = False
+        self.START_KEY = False
+        self.BACK_KEY = False
+        self.LEFT_KEY = False
+        self.RIGHT_KEY = False
+        self.UNICODE_KEY = False
+    
+    def check_events(self):
+        """ Method to check whenever user enters a key """
+        for event in pygame.event.get():      #goes through a list of everything player can do on computer
+            if event.type == pygame.QUIT:       #checks if user closes window
+                self.running = False
+            if event.type == pygame.KEYDOWN:          #checks if user presses something on keyboard
+                if event.key == pygame.K_RETURN:
+                    self.START_KEY = True
+                if event.key == pygame.K_BACKSPACE:
+                    self.BACK_KEY = True
+                if event.key == pygame.K_DOWN:
+                    self.DOWN_KEY = True
+                if event.key == pygame.K_UP:
+                    self.UP_KEY = True
+                if event.key == pygame.K_LEFT:
+                    self.LEFT_KEY = True
+                if event.key == pygame.K_RIGHT:
+                    self.RIGHT_KEY = True
+                else:
+                    self.UNICODE_KEY = True
+                    self.unicode_text = event.unicode    
+
+
+
+################################# PLAYING FUNCTIONS #################################
+
+    def playing_events(self):
+            for event in pygame.event.get():                                                                        #goes through a list of everything player can do on computer
+                if event.type == pygame.QUIT:                                                                      self.running = False
+                if event.type == pygame.KEYDOWN:                                                                    #checks if user presses something on keyboard
+                    if event.key == pygame.K_DOWN:
+                        self.player.move(vec(0,1))
+                    if event.key == pygame.K_UP:
+                        self.player.move(vec(0,-1))
+                    if event.key == pygame.K_LEFT:
+                        self.player.move(vec(-1,0))
+                    if event.key == pygame.K_RIGHT:
+                        self.player.move(vec(1,0))
+
+    def playing_updates(self):
+        self.player.update()
+
+    def playing_draw(self):
+        self.display.fill(self.BLACK)
+        self.display.blit(self.background, (self.TOP_BOTTOM_BUFFER//2, self.TOP_BOTTOM_BUFFER//2))      
+        self.object.pellets()
+        self.object.super_pellets()        
+        #self.draw_grid() # add writing and text in here ~~~~~~ REMOVE HASHTAG TO DRAW GRID
+        self.player.draw()
+        self.playing_updates()    
+        pygame.display.update()
+
+
+################################# GAME OVER FUNCTIONS #################################      
+                    
 
         
