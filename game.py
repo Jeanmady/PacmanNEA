@@ -2,6 +2,7 @@ import pygame
 from pygame.math import Vector2 as vec
 from menu import *
 from player_class import *
+from objects_class import *
 
 class Game():
     """ Attributes """
@@ -26,15 +27,16 @@ class Game():
         self.font_name_defult = pygame.font.Font(None, 20)   
         self.font_name_8bit = '8-BIT WONDER.TTF'
         self.font_name_pacmanio = 'PacmanioFont.TTF'
-        self.BLACK, self.WHITE, self.GREY = (0,0,0), (255,255,255), (107,107,107)
+        self.BLACK, self.WHITE, self.GREY, self.BABY_BLUE = (0,0,0), (255,255,255), (107,107,107), (137,207,240)
         self.main_menu = MainMenu(self)     #refrence main menu object
         self.register_menu = RegisterMenu(self)
         self.login_menu = StartUpMenu(self)         #enables current menu to be chanegd depenfin gon whats selected
         self.signin_menu = SignInMenu(self)
         self.player = Player(self, self.PLAYER_START)
         self.clock = pygame.time.Clock()
-        self.walls = []
+        self.walls, self.pellet, self.super_pellet = [], [], []
         self.load()
+        self.object = Objects(self)
 
     """ Methods """
     def game_loop(self):
@@ -52,6 +54,8 @@ class Game():
 
     def playing_draw(self):
         self.display.fill(self.BLACK)
+        self.object.pellets()
+        self.object.super_pellets()
         self.display.blit(self.background, (self.TOP_BOTTOM_BUFFER//2, self.TOP_BOTTOM_BUFFER//2))              
         #self.draw_grid() # add writing and text in here ~~~~~~ REMOVE HASHTAG TO DRAW GRID
         self.player.draw()    
@@ -66,16 +70,19 @@ class Game():
                 for xidx, char in enumerate(line):
                     if char == "1":
                         self.walls.append(vec(xidx, yidx))  # then it srtores it as a vector
+                    elif char == "P":
+                        self.pellet.append(vec(xidx, yidx)) # here lin to function where we can randomly assign tiems to that spot
+                    elif char == "S":
+                        self.super_pellet.append(vec(xidx, yidx))
+                        
 
-
-
-    """def draw_grid(self):
+    def draw_grid(self):
         for x in range(self.MAZE_W//self.CELL_W):
             pygame.draw.line(self.background, self.GREY, (x*self.CELL_W, 0), (x*self.CELL_W, self.MAZE_H))
         for x in range(self.MAZE_H//self.CELL_H):
             pygame.draw.line(self.background, self.GREY, (0, x*self.CELL_H), ( self.MAZE_W,x*self.CELL_H))
         for wall in self.walls:
-            pygame.draw.rect(self.background, (112, 55, 163), (wall.x*self.CELL_W, wall.y*self.CELL_H, self.CELL_H, self.CELL_H))"""
+            pygame.draw.rect(self.background, (112, 55, 163), (wall.x*self.CELL_W, wall.y*self.CELL_H, self.CELL_H, self.CELL_H))
 
     def playing_events(self):
         for event in pygame.event.get():                                                                        #goes through a list of everything player can do on computer
