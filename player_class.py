@@ -1,7 +1,8 @@
 import pygame
 from pygame.math import *
 vec = pygame.math.Vector2
-
+from databse import *
+from Current_score import *
 
 class Player:
     def __init__(self, game, pos):
@@ -15,6 +16,10 @@ class Player:
         self.direction = vec(1,0)
         self.stored_direction = None
         self.able_to_move = True
+        self.current_score = 0
+        self.DatabaseActions = DatabaseActions(self)
+
+        
 
     def update(self):
         if self.able_to_move:
@@ -29,11 +34,14 @@ class Player:
         self.grid_pos[1] = (self.pix_pos[1]-self.game.TOP_BOTTOM_BUFFER + 
                             self.game.CELL_H//2)//self.game.CELL_H+1
 
-        if self.on_object(self.game.pellet):
-            self.eat_object(self.game.pellet)
+        if self.on_pellet(self.game.pellet):
+            self.eat_pellet(self.game.pellet)
 
-        elif self.on_object(self.game.super_pellet):
-            self.eat_object(self.game.super_pellet)
+        elif self.on_super_pellet(self.game.super_pellet):
+            self.eat_super_pellet(self.game.super_pellet)
+
+
+        self.DatabaseActions.update_score(int(self.current_score))
     
     def draw(self):
         pygame.draw.circle(self.game.display, self.PLAYER_C, (int(self.pix_pos.x), int(self.pix_pos.y)), self.game.CELL_W//2+2)
@@ -60,13 +68,23 @@ class Player:
         return True
 
        
-    def on_object(self, item):
+    def on_pellet(self, item):
         if self.grid_pos in item:
-            item.remove(self.grid_pos)
+            return True
+        return False
             
+    def eat_pellet(self, item):
+        item.remove(self.grid_pos)
+        self.current_score += 10
 
-    def eat_object(self, item):
-        pass
+    def on_super_pellet(self, item):
+        if self.grid_pos in item:
+            return True
+        return False       
+
+    def eat_super_pellet(self, item):
+        item.remove(self.grid_pos)
+        self.current_score += 50
 
     def grace_fruit(self):
         pass

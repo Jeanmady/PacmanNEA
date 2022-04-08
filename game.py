@@ -2,6 +2,7 @@ import pygame
 from pygame.math import Vector2 as vec
 from menu import *
 from player_class import *
+from databse import *
 
 
 class Game():
@@ -20,7 +21,7 @@ class Game():
         self.DISPLAY_H = 270*1.5 
         self.MAZE_W = 560
         self.MAZE_H = 620
-        self.PLAYER_START = vec(1,1)
+        self.PLAYER_START = None
         self.CELL_W = self.MAZE_W // 28
         self.CELL_H = self.MAZE_H // 30
         self.unicode_text = ''
@@ -34,10 +35,13 @@ class Game():
         self.register_menu = RegisterMenu(self)
         self.startup_menu = StartUpMenu(self)         #enables current menu to be chanegd depenfin gon whats selected
         self.signin_menu = SignInMenu(self)
-        self.player = Player(self, self.PLAYER_START)
+        self.DatabaseActions = DatabaseActions(self)
         self.clock = pygame.time.Clock()
         self.walls, self.pellet, self.super_pellet = [], [], []
+        self.ghosts = []
         self.load()
+        self.player = Player(self, self.PLAYER_START)
+        self.make_ghosts()
         
 
     """ Methods """
@@ -57,6 +61,7 @@ class Game():
 
             elif self.mainstate == 'playing':
                 self.display = pygame.display.set_mode((610, 670))
+                self.current_highscore = self.DatabaseActions.get_current_highscore()
                 self.playing_events()
                 self.playing_updates()
                 self.playing_draw()
@@ -90,6 +95,12 @@ class Game():
                         self.pellet.append(vec(xidx, yidx)) # here lin to function where we can randomly assign tiems to that spot
                     elif char == "S":
                         self.super_pellet.append(vec(xidx, yidx))
+                    elif char == "U":
+                        self.PLAYER_START = vec(xidx, yidx)
+
+    def make_ghosts(self):
+        pass
+                    
 
     def draw_text_8bit(self, text, size, x,y):   #try add left organisatoion in order to block fonts later down the line   16/03/22
         """ Method to draw text using 8bit font """
@@ -121,6 +132,14 @@ class Game():
         text_surface = font.render(text, True, self.WHITE)
         text_rect = text_surface.get_rect()
         text_rect.midleft = (x,y)
+        self.display.blit(text_surface, text_rect)
+
+    def draw_text_bottom_right(self, text, size, x,y):
+        """ Method to create text using bottom right as organiser """
+        font = self.font_name_defult
+        text_surface = font.render(text, True, self.WHITE)
+        text_rect = text_surface.get_rect()
+        text_rect.midright = (x,y)
         self.display.blit(text_surface, text_rect)
 
     def reset_keys(self):  
@@ -180,7 +199,9 @@ class Game():
         self.display.fill(self.BLACK)
         self.display.blit(self.background, (self.TOP_BOTTOM_BUFFER//2, self.TOP_BOTTOM_BUFFER//2))      
         self.player.pellets()
-        self.player.super_pellets()        
+        self.player.super_pellets()  
+        self.draw_text_bottom_left(('HIGHSCORE: {}'.format(self.current_highscore)), 16, 5, 10)
+        self.draw_text_bottom_right(('SCORE: {}'.format(self.DatabaseActions.get_current_score())), 16, 595, 10)      
         #self.draw_grid() # add writing and text in here ~~~~~~ REMOVE HASHTAG TO DRAW GRID
         self.player.draw()
         self.playing_updates()    

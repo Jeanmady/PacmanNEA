@@ -1,6 +1,7 @@
 import pygame
 from databse import * 
 import time
+from Current_score import *
 
 class Menu():
     """ Base Menu Class inherited by other Menus """
@@ -177,9 +178,10 @@ class SignInMenu(Menu):
         self.move_cursors()
         if self.game.START_KEY:
             if self.state == 'Login':      # not exiting back rto login menu and not going to game once login is pressed
-                self.DatabaseActions.check_login()
-                if self.DatabaseActions.check_login() == True:
+                #self.DatabaseActions.check_login()
+                if self.DatabaseActions.check_login(self.inp_username, self.inp_pass) == True:
                     self.game.draw_text_8bit('Login Accepted', 15, self.usernamex , self.usernamey -100)
+                    self.DatabaseActions.move_to_playing_database(self.inp_username, self.DatabaseActions.get_ID(self.inp_username), int(self.DatabaseActions.get_highscore(self.inp_username)))
                     self.blit_screen()
                     time.sleep(3)
                     self.inp_pass = ''
@@ -295,8 +297,7 @@ class RegisterMenu(Menu):
         self.move_cursors()
         if self.game.START_KEY:
             if self.state == 'Register':
-                self.DatabaseActions.create_username()
-                if self.DatabaseActions.create_username():
+                if self.DatabaseActions.create_username(self.inp_username, self.inp_pass, self.inp_repass):
                     self.inp_pass = ''
                     self.inp_username = ''
                     self.inp_repass = ''
@@ -323,7 +324,6 @@ class MainMenu(Menu, DatabaseActions):
         self.exitx, self.exity = self.mid_w, self.mid_h + 110
         self.cursor_rect_left.midtop = (self.startx + self.offset_left, self.starty)
         self.cursor_rect_right.midtop = (self.startx + self.offset_right, self.starty)
-        self.highscore = DatabaseActions.currentHighscore
 
     def display_menu(self):
         """ Method to display Menu onto the screen """
@@ -331,9 +331,9 @@ class MainMenu(Menu, DatabaseActions):
         while self.run_display:
             self.game.check_events()
             self.check_input()
+            
             self.game.display.fill(self.game.BLACK)
-            self.game.draw_text_bottom_left('HIGHSCORE:', 16, 5,10)
-            self.game.draw_text_bottom_left((self.highscore), 16, 20,10)
+            self.game.draw_text_bottom_left(('HIGHSCORE: '), 16, 5,10)
             self.game.draw_text_8bit('Main Menu', 20, self.mid_w, self.mid_h - 20)
             self.game.draw_text_8bit("Begin Game", 20, self.startx, self.starty)
             self.game.draw_text_8bit("Game Controls", 20, self.controlsx, self.controlsy)
