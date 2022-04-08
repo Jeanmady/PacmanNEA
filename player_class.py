@@ -6,24 +6,27 @@ from Current_score import *
 
 class Player:
     def __init__(self, game, pos):
-        self.PLAYER_C = (190,194,15)
+        self.PLAYER_C = (253,255,0)
         self.RED = (252, 3, 3)
         self.game = game
         self.grid_pos = pos
-        self.pix_pos = vec((self.grid_pos.x*self.game.CELL_W)+self.game.TOP_BOTTOM_BUFFER//2 + self.game.CELL_W // 2,
-                            (self.grid_pos.y*self.game.CELL_H)+self.game.TOP_BOTTOM_BUFFER//2 + self.game.CELL_H // 2)
+        self.pix_pos = self.get_pix_pos()
         #print(self.grid_pos, self.pix_pos)
         self.direction = vec(1,0)
+        self.speed = 2.5
         self.stored_direction = None
         self.able_to_move = True
         self.current_score = 0
         self.DatabaseActions = DatabaseActions(self)
 
+    def get_pix_pos(self):
+        return vec((self.grid_pos.x*self.game.CELL_W)+self.game.TOP_BOTTOM_BUFFER//2 + self.game.CELL_W // 2,
+                            (self.grid_pos.y*self.game.CELL_H)+self.game.TOP_BOTTOM_BUFFER//2 + self.game.CELL_H // 2)
         
 
     def update(self):
         if self.able_to_move:
-            self.pix_pos += self.direction
+            self.pix_pos += self.direction*self.speed
         if self.time_to_move():
                 if self.stored_direction != None:
                     self.direction = self.stored_direction

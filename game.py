@@ -3,6 +3,7 @@ from pygame.math import Vector2 as vec
 from menu import *
 from player_class import *
 from databse import *
+from ghosts_class import *
 
 
 class Game():
@@ -21,7 +22,6 @@ class Game():
         self.DISPLAY_H = 270*1.5 
         self.MAZE_W = 560
         self.MAZE_H = 620
-        self.PLAYER_START = None
         self.CELL_W = self.MAZE_W // 28
         self.CELL_H = self.MAZE_H // 30
         self.unicode_text = ''
@@ -39,6 +39,7 @@ class Game():
         self.clock = pygame.time.Clock()
         self.walls, self.pellet, self.super_pellet = [], [], []
         self.ghosts = []
+        self.GHOST_POS, self.PLAYER_START = [], None
         self.load()
         self.player = Player(self, self.PLAYER_START)
         self.make_ghosts()
@@ -97,9 +98,14 @@ class Game():
                         self.super_pellet.append(vec(xidx, yidx))
                     elif char == "U":
                         self.PLAYER_START = vec(xidx, yidx)
+                    elif char in ["2","3","4","5"]:
+                        self.GHOST_POS.append(vec(xidx, yidx))
+
+                    
 
     def make_ghosts(self):
-        pass
+        for idx, pos in enumerate(self.GHOST_POS):
+            self.ghosts.append(Ghost(self, vec(pos), idx))
                     
 
     def draw_text_8bit(self, text, size, x,y):   #try add left organisatoion in order to block fonts later down the line   16/03/22
@@ -194,6 +200,8 @@ class Game():
 
     def playing_updates(self):
         self.player.update()
+        for ghost in self.ghosts:
+            ghost.update()
 
     def playing_draw(self):
         self.display.fill(self.BLACK)
@@ -204,6 +212,8 @@ class Game():
         self.draw_text_bottom_right(('SCORE: {}'.format(self.DatabaseActions.get_current_score())), 16, 595, 10)      
         #self.draw_grid() # add writing and text in here ~~~~~~ REMOVE HASHTAG TO DRAW GRID
         self.player.draw()
+        for ghost in self.ghosts:
+            ghost.draw()
         self.playing_updates()    
         pygame.display.update()
 
