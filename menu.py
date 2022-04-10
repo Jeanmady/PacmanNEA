@@ -402,6 +402,37 @@ class MainMenu(Menu, DatabaseActions):
                 self.game.mainstate = 'startup'
             self.run_display = False
 
+class GameOver(Menu):
+    """ Attributes """
+    def __init__(self, game):
+        Menu.__init__(self, game) #gets all variables form menu class
+        self.state = "Start" #so cursor points at start game 
+        self.gameoverx, self.gameovery = self.mid_w, self.mid_h + 10      
+        self.exitx, self.exity = self.mid_w, self.mid_h + 50
+        self.cursor_rect_left.midtop = (self.exitx + self.offset_left, self.exity)
+        self.cursor_rect_right.midtop = (self.exitx + self.offset_right, self.exity)
+
+    def display_menu(self):
+        """ Method to display Menu onto the screen """
+        self.run_display = True
+        while self.run_display:
+            self.game.check_events()
+            self.check_input()
+            self.game.display.fill(self.game.BLACK)
+            self.game.draw_text_bottom_left(('HIGHSCORE: '), 16, 5,10)
+            self.game.draw_text_bottom_right(('SCORE: '), 16, 595,10)
+            self.game.draw_text_8bit('Game Over', 30, self.gameoverx, self.gameovery - 20)
+            self.game.draw_text_8bit('Exit', 20, self.exitx, self.exity)
+            self.draw_cursors()
+            self.blit_screen()
+
+    def check_input(self):
+        """ Checks for user input on keyboard """
+        if self.game.START_KEY:
+            self.game.mainstate = 'mainmenu'
+            self.game.reset()
+            self.run_display = False
+
 class GameControls(Menu):
     """ Attributes """
     def __init__(self, game):

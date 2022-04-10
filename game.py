@@ -1,9 +1,10 @@
 import pygame
 from pygame.math import Vector2 as vec
+import copy
 from menu import *
-from player_class import *
+from player import *
 from databse import *
-from ghosts_class import *
+from ghosts import *
 
 
 class Game():
@@ -36,12 +37,13 @@ class Game():
         self.startup_menu = StartUpMenu(self)         #enables current menu to be chanegd depenfin gon whats selected
         self.signin_menu = SignInMenu(self)
         self.DatabaseActions = DatabaseActions(self)
+        self.gameover_menu = GameOver(self)
         self.clock = pygame.time.Clock()
         self.walls, self.pellet, self.super_pellet = [], [], []
         self.ghosts = []
         self.GHOST_POS, self.PLAYER_START = [], None
         self.load()
-        self.player = Player(self, self.PLAYER_START)
+        self.player = Player(self, vec(self.PLAYER_START))
         self.make_ghosts()
         
 
@@ -67,8 +69,10 @@ class Game():
                 self.playing_updates()
                 self.playing_draw()
 
-            elif self.state == 'game over':
-                pass
+            elif self.mainstate == 'gameover':
+                self.display = pygame.display.set_mode((self.DISPLAY_W, self.DISPLAY_H))
+                self.current_highscore = self.DatabaseActions.get_current_highscore()
+                self.gameover_menu.display_menu()
             else:
                 self.running = False
             self.clock.tick(self.FPS)
@@ -97,15 +101,39 @@ class Game():
                     elif char == "S":
                         self.super_pellet.append(vec(xidx, yidx))
                     elif char == "U":
-                        self.PLAYER_START = vec(xidx, yidx)
+                        self.PLAYER_START = [xidx, yidx]
                     elif char in ["2","3","4","5"]:
                         self.GHOST_POS.append(vec(xidx, yidx))
+                   
 
                     
 
     def make_ghosts(self):
         for idx, pos in enumerate(self.GHOST_POS):
             self.ghosts.append(Ghost(self, vec(pos), idx))
+
+    def reset(self):
+        self.player.lives = 3
+        self.player.current_score = 0
+        self.player.grid_pos = vec(self.player.starting_pos)
+        self.player.pix_pos = self.player.get_pix_pos()
+        self.player.direction *= 0
+        for ghost in self.ghosts:
+                ghost.grid_pos = vec(ghost.starting_pos)
+                ghost.pix_pos = ghost.get_pix_pos()
+                ghost.direction *= 0
+
+        self.pellet = []
+        self.super_pellet = []
+        with open("walls.txt", 'r') as file:
+            for yidx, line in enumerate(file):
+                for xidx, char in enumerate(line):
+                    if char == 'P':
+                        self.pellet.append(vec(xidx, yidx))
+                    elif char == 'S':
+                        self.super_pellet.append(vec(xidx, yidx))
+        self.mainstate = "playing"
+        
                     
 
     def draw_text_8bit(self, text, size, x,y):   #try add left organisatoion in order to block fonts later down the line   16/03/22
@@ -203,6 +231,10 @@ class Game():
         for ghost in self.ghosts:
             ghost.update()
 
+        for ghost in self.ghosts:
+            if ghost.grid_pos == self.player.grid_pos:
+                self.remove_life()
+
     def playing_draw(self):
         self.display.fill(self.BLACK)
         self.display.blit(self.background, (self.TOP_BOTTOM_BUFFER//2, self.TOP_BOTTOM_BUFFER//2))      
@@ -217,8 +249,19 @@ class Game():
         self.playing_updates()    
         pygame.display.update()
 
+    def remove_life(self):
+        self.player.lifes -= 1
+        if self.player.lifes == 0:
+            self.mainstate = "gameover"
+        else:
+            self.player.grid_pos = vec(self.player.starting_pos)
+            self.player.pix_pos = self.player.get_pix_pos()
+            self.player.direction *=0
+            for ghost in self.ghosts:
+                ghost.grid_pos = vec(ghost.starting_pos)
+                ghost.pix_pos = ghost.get_pix_pos()
+                ghost.direction *= 0
 
-################################# GAME OVER FUNCTIONS #################################      
-                    
+                
 
         

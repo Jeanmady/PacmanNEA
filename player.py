@@ -4,24 +4,27 @@ vec = pygame.math.Vector2
 from databse import *
 from Current_score import *
 
+
 class Player:
     def __init__(self, game, pos):
         self.PLAYER_C = (253,255,0)
         self.RED = (252, 3, 3)
         self.game = game
         self.grid_pos = pos
+        self.starting_pos = [pos.x, pos.y]
         self.pix_pos = self.get_pix_pos()
         #print(self.grid_pos, self.pix_pos)
         self.direction = vec(1,0)
-        self.speed = 2.5
+        self.speed = 2
         self.stored_direction = None
         self.able_to_move = True
         self.current_score = 0
         self.DatabaseActions = DatabaseActions(self)
+        self.lifes = 3
 
     def get_pix_pos(self):
-        return vec((self.grid_pos.x*self.game.CELL_W)+self.game.TOP_BOTTOM_BUFFER//2 + self.game.CELL_W // 2,
-                            (self.grid_pos.y*self.game.CELL_H)+self.game.TOP_BOTTOM_BUFFER//2 + self.game.CELL_H // 2)
+        return vec((self.grid_pos[0]*self.game.CELL_W)+self.game.TOP_BOTTOM_BUFFER//2 + self.game.CELL_W // 2,
+                            (self.grid_pos[1]*self.game.CELL_H)+self.game.TOP_BOTTOM_BUFFER//2 + self.game.CELL_H // 2)
         
 
     def update(self):
@@ -36,6 +39,7 @@ class Player:
                             self.game.CELL_W//2)//self.game.CELL_W+1                              #setting grid position in refernce to pixel position
         self.grid_pos[1] = (self.pix_pos[1]-self.game.TOP_BOTTOM_BUFFER + 
                             self.game.CELL_H//2)//self.game.CELL_H+1
+        
 
         if self.on_pellet(self.game.pellet):
             self.eat_pellet(self.game.pellet)
@@ -52,16 +56,19 @@ class Player:
         """pygame.draw.rect(self.game.display, self.RED, (self.grid_pos[0] * self.game.CELL_W+self.game.TOP_BOTTOM_BUFFER//2, 
                                                         self.grid_pos[1] * self.game.CELL_H+self.game.TOP_BOTTOM_BUFFER//2, 
                                                         self.game.CELL_W, self.game.CELL_H), 1) """
+        #drawing player lifes
+        for x in range(self.lifes):
+            pygame.draw.circle(self.game.display, self.RED, (30 + 20*x, 655), 8)
 
     def move(self, direction):
         self.stored_direction = direction
 
     def time_to_move(self):
         if int(self.pix_pos.x+self.game.TOP_BOTTOM_BUFFER//2) % self.game.CELL_W == 0:
-            if self.direction == vec(1,0) or self.direction == vec(-1,0):
+            if self.direction == vec(1,0) or self.direction == vec(-1,0) or self.direction == vec(0,0):#forgot to allow her efor no movement                
                 return True
         if int(self.pix_pos.y+self.game.TOP_BOTTOM_BUFFER//2) % self.game.CELL_H == 0:
-            if self.direction == vec(0,1) or self.direction == vec(0,-1):
+            if self.direction == vec(0,1) or self.direction == vec(0,-1) or self.direction == vec(0,0):
                 return True
        
     def can_move(self):
@@ -88,6 +95,7 @@ class Player:
     def eat_super_pellet(self, item):
         item.remove(self.grid_pos)
         self.current_score += 50
+
 
     def grace_fruit(self):
         pass
