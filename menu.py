@@ -19,6 +19,7 @@ class Menu():
         self.inp_repass = ''
         self.hidden_pass = ''
         self.hidden_repass = ''
+        self.inp_add_friend = ''
         self.DatabaseActions = DatabaseActions(self)
 
     """ Methods """
@@ -333,7 +334,8 @@ class MainMenu(Menu, DatabaseActions):
             self.check_input()
             
             self.game.display.fill(self.game.BLACK)
-            self.game.draw_text_bottom_left(('HIGHSCORE: '), 16, 5,10)
+            self.game.draw_text_Pacmanio('Pacmanio', 60, self.mid_w, self.mid_h / 2 )
+            self.game.draw_text_bottom_left(('HIGHSCORE: {}').format(self.DatabaseActions.get_current_highscore()), 16, 5,10)
             self.game.draw_text_8bit('Main Menu', 20, self.mid_w, self.mid_h - 20)
             self.game.draw_text_8bit("Begin Game", 20, self.startx, self.starty)
             self.game.draw_text_8bit("Game Controls", 20, self.controlsx, self.controlsy)
@@ -393,9 +395,9 @@ class MainMenu(Menu, DatabaseActions):
             if self.state == 'Start':
                 self.game.mainstate = 'playing'
             elif self.state == 'Controls':
-                pass
+                self.game.mainstate = 'controls'
             elif self.state == 'Friends':
-                pass
+                self.game.mainstate = 'addfriends'
             elif self.state == 'Boards':
                 pass
             elif self.state == 'Exit':
@@ -419,8 +421,8 @@ class GameOver(Menu):
             self.game.check_events()
             self.check_input()
             self.game.display.fill(self.game.BLACK)
-            self.game.draw_text_bottom_left(('HIGHSCORE: '), 16, 5,10)
-            self.game.draw_text_bottom_right(('SCORE: '), 16, 595,10)
+            self.game.draw_text_bottom_left(('HIGHSCORE: {}'.format(self.DatabaseActions.get_current_highscore())), 16, 5,10)
+            self.game.draw_text_bottom_right(('SCORE: {}'.format(self.DatabaseActions.get_current_score())), 16, 595,10)
             self.game.draw_text_8bit('Game Over', 30, self.gameoverx, self.gameovery - 20)
             self.game.draw_text_8bit('Exit', 20, self.exitx, self.exity)
             self.draw_cursors()
@@ -429,12 +431,148 @@ class GameOver(Menu):
     def check_input(self):
         """ Checks for user input on keyboard """
         if self.game.START_KEY:
-            self.game.mainstate = 'mainmenu'
             self.game.reset()
+            self.game.mainstate = 'mainmenu'
+            
             self.run_display = False
+
 
 class GameControls(Menu):
     """ Attributes """
     def __init__(self, game):
         Menu.__init__(self, game)
+        self.state = "Start" #so cursor points at start game 
+        self.startx, self.starty = self.mid_w, self.mid_h + 10
+        self.controlsx, self.controlsy = self.mid_w, self.mid_h + 30
+        self.friendsx, self.friendsy = self.mid_w, self.mid_h + 50
+        self.boardsx, self.boardsy = self.mid_w, self.mid_h + 70
+        self.exitx, self.exity = self.mid_w, self.mid_h + 90
+        self.superx, self.supery = self.mid_w, self.mid_h + 110
+        self.stickyx, self.stickyy = self.mid_w, self.mid_h + 130
+        self.cursor_rect_left.midtop = (self.startx + self.offset_left, self.starty)
+        self.cursor_rect_right.midtop = (self.startx + self.offset_right, self.starty)
+
+    def display_menu(self):
+        """ Method to display Menu onto the screen """
+        self.run_display = True
+        while self.run_display:
+            self.game.check_events()
+            self.check_input()
+            self.game.display.fill(self.game.BLACK)
+            self.game.draw_text_Pacmanio('Pacmanio', 60, self.mid_w, (self.mid_h / 2) - 30 )
+            self.game.draw_text_8bit('Controls', 20, self.mid_w, self.mid_h - 40)
+            self.game.draw_text_8bit("arrow keys to move", 12, self.startx, self.starty)
+            self.game.draw_text_8bit("plus 10 pts", 12, self.controlsx, self.controlsy)
+            pygame.draw.circle(self.game.display, self.game.WHITE, (self.mid_w - 90, self.controlsy), 4)
+            self.game.draw_text_8bit("plus one life", 12, self.friendsx, self.friendsy)
+            pygame.draw.circle(self.game.display, self.game.RED, (self.mid_w-90, self.friendsy ), 7)
+            self.game.draw_text_8bit("boosts you", 12, self.boardsx, self.boardsy)
+            pygame.draw.circle(self.game.display, self.game.GREEN, (self.mid_w-90, self.boardsy ), 7)
+            self.game.draw_text_8bit("run away from the ghosts", 12, self.exitx, self.exity)
+            pygame.draw.circle(self.game.display, (234,130,229), (self.mid_w-150, self.exity ), 7)
+            pygame.draw.circle(self.game.display, (70,191,238), (self.mid_w-170, self.exity ), 7)
+            pygame.draw.circle(self.game.display, (208,62,25), (self.mid_w-190, self.exity ), 7)
+            pygame.draw.circle(self.game.display, (219,133,28), (self.mid_w-210, self.exity ), 7)
+            self.game.draw_text_8bit("eat ghosts after eating super pellets", 12, self.superx, self.supery)
+            pygame.draw.circle(self.game.display, self.game.BABY_BLUE, (self.mid_w-220, self.supery ), 6)
+            pygame.draw.circle(self.game.display, (0,0,139), (self.mid_w+220, self.supery ), 7)
+            pygame.draw.circle(self.game.display, (0,0,139), (self.mid_w+240, self.supery ), 7)
+            pygame.draw.circle(self.game.display, (0,0,139), (self.mid_w+260, self.supery ), 7)
+            pygame.draw.circle(self.game.display, (0,0,139), (self.mid_w+280, self.supery ), 7)
+            self.game.draw_text_8bit("walls are sticky do not hit", 12, self.stickyx, self.stickyy)
+            self.game.draw_text_8bit("Press Enter to return", 12, self.stickyx, self.stickyy+ 20)
+            self.blit_screen()
+
+
+    def check_input(self):
+        """ Checks for user input on keyboard """
+        if self.game.START_KEY:
+            self.game.mainstate = 'mainmenu'
+
+            self.run_display = False
+
+
+class AddFriends(Menu):
+    """ Attributes """
+    def __init__(self, game):
+        Menu.__init__(self, game)
+        self.state = "Enter FriendID"
+        self.usernamex, self.usernamey = self.mid_w, self.mid_h 
+        self.passwordx, self.passwordy = self.mid_w, self.mid_h + 20
+        self.loginx, self.loginy = self.mid_w, self.mid_h + 70
+        self.exitx, self.exity = self.mid_w, self.mid_h + 90
+        self.cursor_rect_left.midtop = (self.usernamex - 100 + self.offset_left, self.usernamey)
+        self.cursor_rect_right.midtop = (self.usernamex + 40 + self.offset_right, self.usernamey)
+
+    def display_menu(self):
+        """ Method to display Menu onto the screen """
+        self.run_display = True
+        while self.run_display:
+            self.game.check_events()
+            self.check_input()
+            self.game.display.fill(self.game.BLACK)
+            self.game.draw_text_8bit('Enter FriendID', 15, self.usernamex - 100, self.usernamey)
+            self.game.draw_text_8bit("Add Friend", 15, self.passwordx, self.passwordy)
+            self.game.draw_text_8bit("Exit", 20, self.loginx, self.loginy)
+            self.game.draw_text_bottom_left(self.inp_add_friend, 10, self.usernamex + 10, self.usernamey )
+            self.draw_cursors()
+            self.blit_screen()
+
+    def move_cursors(self):
+        """Method moves cursor by:
+            Checking state, 
+            adjusting cursors, 
+            then readjust state"""
+        if self.game.DOWN_KEY:
+            if self.state == 'Enter FriendID':
+                self.cursor_rect_left.midtop = (self.passwordx - 100 + self.offset_left, self.passwordy)
+                self.cursor_rect_right.midtop = (self.passwordx + 40 + self.offset_right, self.passwordy)
+                self.state = 'Add Friend'
+            elif self.state == 'Add Friend':
+                self.cursor_rect_left.midtop = (self.loginx - 100 + self.offset_left, self.loginy)
+                self.cursor_rect_right.midtop = (self.loginx + 40 + self.offset_right, self.loginy)
+                self.state = 'Exit'
+
+        elif self.game.UP_KEY:
+            if self.state == 'Exit':
+                self.cursor_rect_left.midtop = (self.loginx + self.offset_left, self.loginy)
+                self.cursor_rect_right.midtop = (self.loginx + self.offset_right, self.loginy)
+                self.state = 'Add Friend'
+            elif self.state == 'Add Friend':
+                self.cursor_rect_left.midtop = (self.passwordx - 100 + self.offset_left, self.passwordy)
+                self.cursor_rect_right.midtop = (self.passwordx + 40 + self.offset_right, self.passwordy)
+                self.state = 'Exit'
+
+        elif self.game.BACK_KEY:
+                    if self.state == 'Enter FriendID':
+                        self.inp_add_friend = self.inp_add_friend[:-1]
+                    
+
+        elif self.game.UNICODE_KEY:
+            if self.state == 'Enter FriendID':
+                self.inp_add_friend += self.game.unicode_text
+
+    def check_input(self):
+        """ Checks for user input on keyboard """
+        self.move_cursors()
+        if self.game.START_KEY:
+            if self.state == 'Add Friend':   
+                if self.DatabaseActions.add_friend(self.DatabaseActions.get_current_userid(), self.inp_add_friend) == True:
+                    self.game.draw_text_8bit('Friend added', 15, self.usernamex , self.usernamey -100)
+                    self.blit_screen()
+                    time.sleep(3)
+                    self.inp_add_friend = ''
+                    self.game.mainstate = 'mainmenu'
+            elif self.state == 'Exit':
+                self.inp_add_friend = ''
+                self.game.mainstate = 'mainmenu'
+            self.run_display = False
+    
+class ScoreBoards(Menu):
+    """ Attributes """
+    def __init__(self, game):
+        Menu.__init__(self, game)
+    
+
+    
     

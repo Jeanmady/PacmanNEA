@@ -3,6 +3,7 @@ from pygame.math import *
 vec = pygame.math.Vector2
 from databse import *
 from Current_score import *
+import time
 
 
 class Player:
@@ -21,6 +22,8 @@ class Player:
         self.current_score = 0
         self.DatabaseActions = DatabaseActions(self)
         self.lifes = 3
+        self.speed_timer = 0
+        self.scared_timer = 0
 
     def get_pix_pos(self):
         return vec((self.grid_pos[0]*self.game.CELL_W)+self.game.TOP_BOTTOM_BUFFER//2 + self.game.CELL_W // 2,
@@ -39,16 +42,35 @@ class Player:
                             self.game.CELL_W//2)//self.game.CELL_W+1                              #setting grid position in refernce to pixel position
         self.grid_pos[1] = (self.pix_pos[1]-self.game.TOP_BOTTOM_BUFFER + 
                             self.game.CELL_H//2)//self.game.CELL_H+1
-        
 
         if self.on_pellet(self.game.pellet):
             self.eat_pellet(self.game.pellet)
 
         elif self.on_super_pellet(self.game.super_pellet):
             self.eat_super_pellet(self.game.super_pellet)
+            self.game.ghost_state("frightened")
+            self.scared_timer = 1300
 
+        if self.on_extra_life(self.game.extra_life):
+            self.eat_extra_life(self.game.extra_life)
+            self.lifes += 1
 
+        if self.on_speed_fruit(self.game.speed_fruit):
+            self.eat_speed_fruit(self.game.speed_fruit)
+            self.speed = 4
+            self.speed_timer = 8
+
+        self.speed_timer -= 1
+        if self.speed_timer <= 0:
+            self.speed = 2
+
+        self.scared_timer -=1
+        if self.scared_timer <= 0:
+            self.game.ghost_state("chase")
+        
         self.DatabaseActions.update_score(int(self.current_score))
+        if self.current_score > int(self.DatabaseActions.get_current_highscore()):
+            self.DatabaseActions.update_current_highscore(self.current_score)
     
     def draw(self):
         pygame.draw.circle(self.game.display, self.PLAYER_C, (int(self.pix_pos.x), int(self.pix_pos.y)), self.game.CELL_W//2+2)
@@ -97,12 +119,24 @@ class Player:
         self.current_score += 50
 
 
-    def grace_fruit(self):
-        pass
+    def on_speed_fruit(self, item):
+        if self.grid_pos in item:
+            return True
+        return False
+    
+    def eat_speed_fruit(self, item):
+        item.remove(self.grid_pos)
 
-    def freeze_fruit(self):
-        pass
+    def on_extra_life(self, item):
+        if self.grid_pos in item:
+            return True
+        return False
+    
+    def eat_extra_life(self, item):
+        item.remove(self.grid_pos)
 
+
+    
     def super_pellets(self):
         for super_pellets in self.game.super_pellet:
             pygame.draw.circle(self.game.display, self.game.BABY_BLUE, (int(super_pellets.x*self.game.CELL_W)+ self.game.CELL_W//2+self.game.TOP_BOTTOM_BUFFER//2,
@@ -112,7 +146,17 @@ class Player:
     def pellets(self):
         for pellets in self.game.pellet:
             pygame.draw.circle(self.game.display, self.game.WHITE, (int(pellets.x*self.game.CELL_W)+ self.game.CELL_W//2+self.game.TOP_BOTTOM_BUFFER//2,
-                                                                       int(pellets.y*self.game.CELL_H)+self.game.CELL_H//2+self.game.TOP_BOTTOM_BUFFER//2), 3) 
+                                                                       int(pellets.y*self.game.CELL_H)+self.game.CELL_H//2+self.game.TOP_BOTTOM_BUFFER//2), 3)
+    
+    def speed_fruit(self):
+        for speed_fruits in self.game.speed_fruit:
+            pygame.draw.circle(self.game.display, self.game.GREEN, (int(speed_fruits.x*self.game.CELL_W)+ self.game.CELL_W//2+self.game.TOP_BOTTOM_BUFFER//2,
+                                                                       int(speed_fruits.y*self.game.CELL_H)+self.game.CELL_H//2+self.game.TOP_BOTTOM_BUFFER//2), 6)
+
+    def extra_life(self):
+        for extra_lifes in self.game.extra_life:
+            pygame.draw.circle(self.game.display, self.RED, (int(extra_lifes.x*self.game.CELL_W)+ self.game.CELL_W//2+self.game.TOP_BOTTOM_BUFFER//2,
+                                                                       int(extra_lifes.y*self.game.CELL_H)+self.game.CELL_H//2+self.game.TOP_BOTTOM_BUFFER//2), 6) 
         
 
         

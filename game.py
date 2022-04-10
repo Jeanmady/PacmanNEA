@@ -31,15 +31,17 @@ class Game():
         self.font_name_defult = pygame.font.Font(None, 20)   
         self.font_name_8bit = '8-BIT WONDER.TTF'
         self.font_name_pacmanio = 'PacmanioFont.TTF'
-        self.BLACK, self.WHITE, self.GREY, self.BABY_BLUE = (0,0,0), (255,255,255), (107,107,107), (137,207,240)
+        self.BLACK, self.WHITE, self.GREY, self.BABY_BLUE, self.GREEN, self.RED = (0,0,0), (255,255,255), (107,107,107), (137,207,240), (0,255,0), (252, 3, 3)
         self.main_menu = MainMenu(self)     #refrence main menu object
+        self.add_friends_menu = AddFriends(self)
+        self.controls_menu = GameControls(self)
         self.register_menu = RegisterMenu(self)
         self.startup_menu = StartUpMenu(self)         #enables current menu to be chanegd depenfin gon whats selected
         self.signin_menu = SignInMenu(self)
         self.DatabaseActions = DatabaseActions(self)
         self.gameover_menu = GameOver(self)
         self.clock = pygame.time.Clock()
-        self.walls, self.pellet, self.super_pellet = [], [], []
+        self.walls, self.pellet, self.super_pellet ,self.speed_fruit, self.extra_life = [], [], [], [], []
         self.ghosts = []
         self.GHOST_POS, self.PLAYER_START = [], None
         self.load()
@@ -62,6 +64,12 @@ class Game():
             elif self.mainstate == 'mainmenu':
                 self.main_menu.display_menu()
 
+            elif self.mainstate == 'controls':
+                self.controls_menu.display_menu()
+
+            elif self.mainstate == 'addfriends':
+                self.add_friends_menu.display_menu()
+
             elif self.mainstate == 'playing':
                 self.display = pygame.display.set_mode((610, 670))
                 self.current_highscore = self.DatabaseActions.get_current_highscore()
@@ -73,6 +81,7 @@ class Game():
                 self.display = pygame.display.set_mode((self.DISPLAY_W, self.DISPLAY_H))
                 self.current_highscore = self.DatabaseActions.get_current_highscore()
                 self.gameover_menu.display_menu()
+                
             else:
                 self.running = False
             self.clock.tick(self.FPS)
@@ -104,8 +113,15 @@ class Game():
                         self.PLAYER_START = [xidx, yidx]
                     elif char in ["2","3","4","5"]:
                         self.GHOST_POS.append(vec(xidx, yidx))
+                    elif char == "R":
+                        self.random_object().append(vec(xidx, yidx))
                    
-
+    def random_object(self):
+        chance = random.randint(1,10)
+        if chance <= 6:
+            return self.speed_fruit
+        else:
+            return self.extra_life
                     
 
     def make_ghosts(self):
@@ -113,15 +129,9 @@ class Game():
             self.ghosts.append(Ghost(self, vec(pos), idx))
 
     def reset(self):
-        self.player.lives = 3
+        self.player.lifes = 3
         self.player.current_score = 0
-        self.player.grid_pos = vec(self.player.starting_pos)
-        self.player.pix_pos = self.player.get_pix_pos()
-        self.player.direction *= 0
-        for ghost in self.ghosts:
-                ghost.grid_pos = vec(ghost.starting_pos)
-                ghost.pix_pos = ghost.get_pix_pos()
-                ghost.direction *= 0
+        
 
         self.pellet = []
         self.super_pellet = []
@@ -132,6 +142,8 @@ class Game():
                         self.pellet.append(vec(xidx, yidx))
                     elif char == 'S':
                         self.super_pellet.append(vec(xidx, yidx))
+                    elif char == 'R':
+                        self.random_object().append(vec(xidx, yidx))
         self.mainstate = "playing"
         
                     
@@ -233,14 +245,24 @@ class Game():
 
         for ghost in self.ghosts:
             if ghost.grid_pos == self.player.grid_pos:
-                self.remove_life()
+                if ghost.ghost_state =="chase":
+                    self.remove_life()
+                elif ghost.ghost_state == "frightened":
+                    ghost.ghost_state = "eaten"
+                    self.player.current_score += 200
+
+    def ghost_state(self, state):
+        for ghost in self.ghosts:
+            ghost.ghost_state = state
 
     def playing_draw(self):
         self.display.fill(self.BLACK)
         self.display.blit(self.background, (self.TOP_BOTTOM_BUFFER//2, self.TOP_BOTTOM_BUFFER//2))      
         self.player.pellets()
-        self.player.super_pellets()  
-        self.draw_text_bottom_left(('HIGHSCORE: {}'.format(self.current_highscore)), 16, 5, 10)
+        self.player.super_pellets()
+        self.player.speed_fruit()
+        self.player.extra_life()
+        self.draw_text_bottom_left(('HIGHSCORE: {}'.format(self.DatabaseActions.get_current_highscore())), 16, 5, 10)
         self.draw_text_bottom_right(('SCORE: {}'.format(self.DatabaseActions.get_current_score())), 16, 595, 10)      
         #self.draw_grid() # add writing and text in here ~~~~~~ REMOVE HASHTAG TO DRAW GRID
         self.player.draw()
@@ -252,7 +274,9 @@ class Game():
     def remove_life(self):
         self.player.lifes -= 1
         if self.player.lifes == 0:
+            self.DatabaseActions.update_highscore(int(self.DatabaseActions.get_current_userid()), int(self.DatabaseActions.get_current_highscore()))
             self.mainstate = "gameover"
+
         else:
             self.player.grid_pos = vec(self.player.starting_pos)
             self.player.pix_pos = self.player.get_pix_pos()

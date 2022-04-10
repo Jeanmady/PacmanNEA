@@ -70,6 +70,7 @@ class Ghost:
 
     def move(self):
         if self.ghost_state == "chase":
+            self.colour = self.set_colour()
             if self.name == "blinky":
                 self.direction = self.get_path_direction(self.game.player.grid_pos)
             if self.name == "pinky":
@@ -99,12 +100,13 @@ class Ghost:
             
 
         if self.ghost_state == "frightened":
+            self.change_of_state()
             self.colour = (0,0,139)
             self.direction = self.get_random_direction(self.direction)
             
         if self.ghost_state == "eaten":
-            pass
-
+            self.colour = self.game.WHITE
+            self.direction = vec(0,0)
 
 
     def get_path_direction(self, target):
@@ -170,11 +172,17 @@ class Ghost:
 
             next_pos = vec(self.grid_pos.x + x_dir, self.grid_pos.y + y_dir)
 
-            if vec(-x_dir, -y_dir) != curr_direction:
-
-                if next_pos not in self.game.walls:
-                    break
+            if vec(-x_dir, -y_dir) == curr_direction:
+                pass
+                
+            if next_pos not in self.game.walls:
+                break
         return vec(x_dir, y_dir)
+
+    def ghost_eaten(self):
+        self.colour = self.game.WHITE
+        self.direction = self.get_path_direction([13, 15])
+        
 
     def change_of_state(self):
         self.direction = vec(-self.direction.x, -self.direction.y)
