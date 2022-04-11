@@ -399,7 +399,7 @@ class MainMenu(Menu, DatabaseActions):
             elif self.state == 'Friends':
                 self.game.mainstate = 'addfriends'
             elif self.state == 'Boards':
-                pass
+                self.game.mainstate = 'boards'
             elif self.state == 'Exit':
                 self.game.mainstate = 'startup'
             self.run_display = False
@@ -541,7 +541,7 @@ class AddFriends(Menu):
             elif self.state == 'Add Friend':
                 self.cursor_rect_left.midtop = (self.passwordx - 100 + self.offset_left, self.passwordy)
                 self.cursor_rect_right.midtop = (self.passwordx + 40 + self.offset_right, self.passwordy)
-                self.state = 'Exit'
+                self.state = 'Enter FriendID'
 
         elif self.game.BACK_KEY:
                     if self.state == 'Enter FriendID':
@@ -572,6 +572,38 @@ class ScoreBoards(Menu):
     """ Attributes """
     def __init__(self, game):
         Menu.__init__(self, game)
+        self.state = "Start" #so cursor points at start game 
+        self.startx, self.starty = self.mid_w, self.mid_h + 30
+        self.controlsx, self.controlsy = self.mid_w, self.mid_h + 50
+        self.friendsx, self.friendsy = self.mid_w, self.mid_h + 70
+        self.boardsx, self.boardsy = self.mid_w, self.mid_h + 90
+        self.exitx, self.exity = self.mid_w, self.mid_h + 110
+        self.cursor_rect_left.midtop = (self.startx + self.offset_left, self.starty)
+        self.cursor_rect_right.midtop = (self.startx + self.offset_right, self.starty)
+
+    def display_menu(self):
+        """ Method to display Menu onto the screen """
+        self.run_display = True
+        while self.run_display:
+            self.game.check_events()
+            self.check_input()
+            
+            self.game.display.fill(self.game.BLACK)
+            all_scores = self.game.get_highscores_dict(self.DatabaseActions.get_all_scores())
+            for item in all_scores:
+                    i = 0
+                    while i< 10:
+                        self.game.draw_text_8bit('{},{}'.format(item, all_scores[item]), 8, self.mid_w/2, (self.mid_h - 20)+40*i)
+                        i+=1
+            
+            self.blit_screen()
+
+
+    def check_input(self):
+        """ Checks for user input on keyboard """
+        if self.game.START_KEY:
+            self.game.mainstate = 'mainmenu'
+            self.run_display = False
     
 
     

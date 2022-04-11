@@ -38,6 +38,7 @@ class Game():
         self.register_menu = RegisterMenu(self)
         self.startup_menu = StartUpMenu(self)         #enables current menu to be chanegd depenfin gon whats selected
         self.signin_menu = SignInMenu(self)
+        self.boards_menu = ScoreBoards(self)
         self.DatabaseActions = DatabaseActions(self)
         self.gameover_menu = GameOver(self)
         self.clock = pygame.time.Clock()
@@ -53,6 +54,7 @@ class Game():
     def game_loop(self): # This runs the whole program checking th e main state to see what is running and chabges it when the mainstate changes
         while self.running:
             if self.mainstate == 'startup':
+            
                 self.startup_menu.display_menu()
 
             elif self.mainstate == 'register':
@@ -69,6 +71,9 @@ class Game():
 
             elif self.mainstate == 'addfriends':
                 self.add_friends_menu.display_menu()
+
+            elif self.mainstate == 'boards':
+                self.boards_menu.display_menu()
 
             elif self.mainstate == 'playing':
                 self.display = pygame.display.set_mode((610, 670))
@@ -87,6 +92,12 @@ class Game():
             self.clock.tick(self.FPS)
 
 ################################# MULTIUSE HELPER FUNCTIONS #################################
+
+    def get_highscores_dict(self, table):
+        value_key_pairs = ((value, key) for (key,value) in table.items())
+        sorted_value_key_pairs = sorted(value_key_pairs, reverse=True)
+        global_board = {k: v for v, k in sorted_value_key_pairs}
+        return global_board
 
     def draw_grid(self):
         for x in range(self.MAZE_W//self.CELL_W):

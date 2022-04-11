@@ -37,10 +37,8 @@ cur = conn.cursor()
             UserID integer NOT NULL,
             Highscore integer,
             Score integer )"""
-
 """cur.execute(INSERT INTO Current(Username, UserID, Highscore, Score)
                 VALUES("test", 5, 5, 0)"""
-cur.execute("SELECT * FROM Users")
 record = cur.fetchall()
 for item in record:
     print(item)
@@ -60,7 +58,17 @@ class DatabaseActions():
     def get_all_scores(self):
         conn = sql.connect('usernamedatabase')
         c = conn.cursor()
-        c.execute("SELECT Username, Password FROM Users")
+        c.execute("SELECT Username, Highscore FROM Users")
+        records = c.fetchall()
+        results = {}
+        for row in records:
+            results[row[0]]= row[1] #dict fo r now but mbye srrsy
+        return results
+
+    def get_friend_scores(self):
+        conn = sql.connect('usernamedatabase')
+        c = conn.cursor()
+        c.execute("SELECT Username, Highscore FROM Users WHERE UserID IN (SELECT FriendID FROM Friends_{})".format(self.get_current_userid))
         records = c.fetchall()
         results = {}
         for row in records:
